@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Water Education v0.1</title>
+    <title>Water Education v0.1 - GOOFY EDITION</title>
     <style>
-        /* Deep Midnight Theme */
+        /* Goofy Neon Theme */
         body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background-color: #020617; /* Very deep dark blue */
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif; 
+            background-color: #0f172a;
+            background-image: radial-gradient(#1e293b 2px, transparent 2px);
+            background-size: 30px 30px; /* Polka dot background */
             color: #f1f5f9; 
             margin: 0; 
             display: flex;
@@ -18,150 +20,178 @@
             overflow-x: hidden;
         }
 
+        /* Floating Background Bubbles */
+        .bubble {
+            position: absolute;
+            background: rgba(56, 189, 248, 0.2);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-100px) rotate(20deg); }
+        }
+
         /* LANDING PAGE SECTION */
         #welcome-screen {
             text-align: center;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             max-width: 600px;
-            padding: 20px;
+            padding: 40px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 5px solid #a855f7;
+            border-radius: 40px;
+            transform: rotate(-2deg);
         }
 
         #welcome-screen h1 {
-            font-size: 3.5rem;
-            color: #38bdf8; /* Bright light blue */
-            margin-bottom: 15px;
-            letter-spacing: -1px;
+            font-size: 4rem;
+            color: #22d3ee;
+            text-shadow: 5px 5px #a855f7;
+            margin-bottom: 10px;
+            animation: wigglev1 0.3s infinite alternate;
         }
 
-        #welcome-screen p {
-            font-size: 1.1rem;
-            color: #94a3b8;
-            line-height: 1.6;
-            margin-bottom: 35px;
+        @keyframes wigglev1 {
+            from { transform: rotate(-1deg); }
+            to { transform: rotate(1deg); }
         }
 
         .enter-btn {
-            background: #0ea5e9;
+            background: #f43f5e;
             color: white;
-            border: none;
-            padding: 16px 45px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 12px;
+            border: 4px solid #fff;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+            transition: 0.2s;
+            box-shadow: 0 10px 0 #9f1239;
         }
 
         .enter-btn:hover {
-            background: #38bdf8;
-            transform: translateY(-3px);
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
+            transform: scale(1.1) rotate(5deg);
+            background: #fb7185;
         }
 
-        /* GAMES SECTION (Hidden Initially) */
+        .enter-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 5px 0 #9f1239;
+        }
+
+        /* GAMES SECTION */
         #game-section {
             display: none; 
             opacity: 0;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1100px;
             padding: 50px 20px;
             text-align: center;
-            position: absolute;
-            top: 0;
         }
 
         .game-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-            gap: 30px; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 40px; 
             margin-top: 50px;
         }
 
-        /* Game Card Styles */
+        /* Goofy Card Styles */
         .game-card { 
-            background: #0f172a; 
-            border-radius: 24px; 
+            background: #1e293b; 
+            border-radius: 30px; 
             overflow: hidden; 
             position: relative; 
-            transition: all 0.4s ease; 
-            border: 1px solid #1e293b;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border: 6px solid #38bdf8;
             text-decoration: none; 
             display: block; 
         }
 
+        .game-card:nth-child(even) { transform: rotate(2deg); border-color: #a855f7; }
+        .game-card:nth-child(odd) { transform: rotate(-2deg); border-color: #4ade80; }
+
         .game-card:hover { 
-            transform: translateY(-10px) scale(1.02); 
-            border-color: #38bdf8;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(-15px) scale(1.05) rotate(0deg) !important; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            z-index: 10;
         }
 
-        .game-img { width: 100%; height: 180px; object-fit: cover; display: block; }
+        .game-img { width: 100%; height: 200px; object-fit: cover; }
 
-        .game-info { padding: 20px; background: #0f172a; border-top: 1px solid #1e293b; }
+        .game-info { padding: 20px; background: #1e293b; }
 
-        .game-title { font-weight: 700; font-size: 1.2rem; color: #f8fafc; }
+        .game-title { font-weight: 900; font-size: 1.4rem; color: #fff; }
 
-        /* Hover Description Overlay */
+        /* Description Pop-up */
         .description-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(14, 165, 233, 0.92); /* Strong light blue */
-            color: #020617;
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
             display: flex; align-items: center; justify-content: center;
-            padding: 25px; box-sizing: border-box;
-            opacity: 0; transition: 0.3s ease;
-            font-weight: 600; font-size: 1rem; text-align: center;
+            padding: 20px; box-sizing: border-box;
+            opacity: 0; transition: 0.2s;
+            font-weight: bold; transform: translateY(100%);
         }
 
-        .game-card:hover .description-overlay { opacity: 1; }
+        .game-card:hover .description-overlay { opacity: 1; transform: translateY(0); }
 
-        /* Transition Effects */
-        .hidden-fade { opacity: 0; transform: translateY(-20px); pointer-events: none; }
-        .show-content { display: block !important; opacity: 1 !important; transition: opacity 1s ease; }
+        .show-content { display: block !important; opacity: 1 !important; animation: popIn 0.8s ease forwards; }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
+    <div class="bubble" style="width: 100px; height: 100px; top: 10%; left: 10%;"></div>
+    <div class="bubble" style="width: 150px; height: 150px; bottom: 20%; right: 10%; animation-delay: 2s;"></div>
+
     <div id="welcome-screen">
-        <h1>Water Education v0.1</h1>
-        <p>Explore interactive modules and high-precision physical simulations designed for advanced learning environments.</p>
-        <button class="enter-btn" onclick="openVault()">Enter Games</button>
+        <h1>WATER ED v0.1</h1>
+        <p>This is probably educational? I don't know, just click the big red button below to find out! 🦆</p>
+        <button class="enter-btn" onclick="openVault()">CLICK ME!!</button>
     </div>
 
     <div id="game-section">
-        <h2 style="color: #38bdf8; font-size: 2.2rem; margin-top: 0;">Simulation Directory</h2>
+        <h2 style="color: #4ade80; font-size: 3rem; text-shadow: 3px 3px #000;">THE GAME VAULT</h2>
         
         <div class="game-grid">
             
             <a href="celeste-game.html" class="game-card">
                 <img src="celeste-thumb.jpeg" class="game-img" />
                 <div class="game-info">
-                    <div class="game-title">Celeste Classic</div>
+                    <div class="game-title">🏔️ Celeste Classic</div>
                 </div>
-                <div class="description-overlay">Test your reaction speed and precision in this high-altitude climbing simulation.</div>
+                <div class="description-overlay">CLIMB THE MOUNTAIN! DON'T FALL!!</div>
             </a>
 
             <a href="buckshot-roulette-game.html" class="game-card">
                 <img src="buckshot.jpeg" class="game-img" />
                 <div class="game-info">
-                    <div class="game-title">Buckshot Roulette</div>
+                    <div class="game-title">🔫 Buckshot Roulette</div>
                 </div>
-                <div class="description-overlay">A game of probability and logic. Calculated risks only.</div>
+                <div class="description-overlay">VERY SCARY ODDS. GOOD LUCK!</div>
             </a>
             
-            <a href="crazy-chicken-game.html" class="game-card">
-    <img src="crazy.jpeg" class="game-img" style="object-fit: cover; width: 100%; height: 200px;" />
-    <div class="game-info">
-        <div class="game-title">Crazy Chicken 3D</div>
-        <p style="color: #888; font-size: 14px;">Chicken battle royale xd</p>
-    </div>
-</a>
-            <div class="game-card" style="opacity: 0.4; cursor: default;">
-                <div style="height: 180px; display: flex; align-items: center; justify-content: center; font-size: 50px; background: #1e293b;">?</div>
+            <a href="chicken-game/game.html" class="game-card">
+                <img src="chicken-game/image_020484.jpg" class="game-img" />
                 <div class="game-info">
-                    <div class="game-title">More Loading...</div>
+                    <div class="game-title">🐔 Crazy Chicken 3D</div>
+                    <p style="color: #aaa; font-size: 14px;">The Teasle Classic</p>
+                </div>
+                <div class="description-overlay">CHICKENS EVERYWHERE! RUN!</div>
+            </a>
+
+            <div class="game-card" style="border-style: dashed; opacity: 0.7;">
+                <div style="height: 200px; display: flex; align-items: center; justify-content: center; font-size: 80px; background: #334155;">❓</div>
+                <div class="game-info">
+                    <div class="game-title">Coming Soon...</div>
                 </div>
             </div>
 
@@ -170,20 +200,17 @@
 
     <script>
         function openVault() {
-            // Fade out the welcome text
             const welcome = document.getElementById('welcome-screen');
-            welcome.classList.add('hidden-fade');
+            welcome.style.transform = 'scale(0) rotate(500deg)';
+            welcome.style.opacity = '0';
 
-            // Wait for fade to finish, then show the grid
             setTimeout(() => {
                 welcome.style.display = 'none';
                 const games = document.getElementById('game-section');
                 games.classList.add('show-content');
-                
-                // Set body to start at the top for the new section
                 document.body.style.alignItems = 'flex-start';
                 window.scrollTo(0, 0);
-            }, 800);
+            }, 600);
         }
     </script>
     
