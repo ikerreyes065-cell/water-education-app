@@ -539,3 +539,33 @@ class Gameboard {
 }
 
 const activteGame = new Gameboard();
+
+// Función para iniciar el juego sin servidor
+function startOfflineGame() {
+    console.log("Iniciando modo offline...");
+    
+    // Creamos datos falsos para que el juego no de error
+    const fakeGameData = {
+        timeLeft: 60,
+        chicks: [
+            { id: 1, x: 5000, y: 5000, direction: 'e', alive: true, lives: 3 },
+            { id: 2, x: 2000, y: 3000, direction: 'w', alive: true, lives: 3 },
+            { id: 3, x: 8000, y: 7000, direction: 'n', alive: true, lives: 3 }
+        ]
+    };
+
+    activteGame.myRole = 'h'; // Te pone como cazador
+    activteGame.bulletsLeft = 10;
+    activteGame.startGame(fakeGameData);
+}
+
+// Conectamos el botón de tu HTML con esta función
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('start-simulation');
+    if(btn) {
+        btn.onclick = function() {
+            startOfflineGame();
+            document.getElementById('mainContainer').style.display = 'none';
+        };
+    }
+});
