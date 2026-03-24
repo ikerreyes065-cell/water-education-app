@@ -3,130 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Vault | Unblocked</title>
+    <title>Water Education v0.1</title>
     <style>
-        /* Darker, High-Contrast Theme */
+        /* Deep Midnight Theme */
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
-            background-color: #050a14; /* Very dark midnight blue */
-            color: #e2e8f0; 
+            background-color: #020617; /* Very deep dark blue */
+            color: #f1f5f9; 
             margin: 0; 
-            overflow-x: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* 1. WELCOME SECTION */
+        /* LANDING PAGE SECTION */
         #welcome-screen {
             text-align: center;
-            transition: opacity 0.6s ease, transform 0.6s ease;
-            position: absolute;
-            z-index: 10;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 600px;
+            padding: 20px;
         }
 
         #welcome-screen h1 {
             font-size: 3.5rem;
-            color: #00d2ff;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
+            color: #38bdf8; /* Bright light blue */
+            margin-bottom: 15px;
+            letter-spacing: -1px;
         }
 
         #welcome-screen p {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #94a3b8;
-            margin-bottom: 30px;
-            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 35px;
         }
 
         .enter-btn {
-            background: linear-gradient(45deg, #00d2ff, #3a86ff);
+            background: #0ea5e9;
             color: white;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
+            padding: 16px 45px;
+            font-size: 1.1rem;
             font-weight: bold;
-            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
         }
 
         .enter-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.7);
+            background: #38bdf8;
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
         }
 
-        /* 2. GAMES SECTION (Hidden by default) */
+        /* GAMES SECTION (Hidden Initially) */
         #game-section {
-            display: none; /* Starts hidden */
+            display: none; 
             opacity: 0;
             width: 100%;
             max-width: 1200px;
-            padding: 40px 20px;
+            padding: 50px 20px;
             text-align: center;
+            position: absolute;
+            top: 0;
         }
 
         .game-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
             gap: 30px; 
-            margin-top: 40px;
+            margin-top: 50px;
         }
 
-        /* The Game Card */
+        /* Game Card Styles */
         .game-card { 
             background: #0f172a; 
-            border-radius: 20px; 
+            border-radius: 24px; 
             overflow: hidden; 
             position: relative; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: all 0.4s ease; 
             border: 1px solid #1e293b;
             text-decoration: none; 
             display: block; 
         }
 
         .game-card:hover { 
-            transform: translateY(-10px); 
-            border-color: #00d2ff;
-            box-shadow: 0 0 25px rgba(0, 210, 255, 0.2);
+            transform: translateY(-10px) scale(1.02); 
+            border-color: #38bdf8;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
         }
 
         .game-img { width: 100%; height: 180px; object-fit: cover; display: block; }
 
-        .game-info { padding: 15px; background: #0f172a; }
+        .game-info { padding: 20px; background: #0f172a; border-top: 1px solid #1e293b; }
 
-        .game-title { font-weight: 800; font-size: 1.1rem; color: #f8fafc; }
+        .game-title { font-weight: 700; font-size: 1.2rem; color: #f8fafc; }
 
-        /* Hover Overlay */
+        /* Hover Description Overlay */
         .description-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 210, 255, 0.85);
-            color: #050a14;
+            background: rgba(14, 165, 233, 0.92); /* Strong light blue */
+            color: #020617;
             display: flex; align-items: center; justify-content: center;
-            padding: 20px; box-sizing: border-box;
-            opacity: 0; transition: 0.3s;
-            font-weight: 600; text-align: center;
+            padding: 25px; box-sizing: border-box;
+            opacity: 0; transition: 0.3s ease;
+            font-weight: 600; font-size: 1rem; text-align: center;
         }
 
         .game-card:hover .description-overlay { opacity: 1; }
 
-        /* Utility Class to Show/Hide */
-        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
-        .fade-in { display: block !important; opacity: 1 !important; transition: 1s ease; }
+        /* Transition Effects */
+        .hidden-fade { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+        .show-content { display: block !important; opacity: 1 !important; transition: opacity 1s ease; }
     </style>
 </head>
 <body>
 
     <div id="welcome-screen">
-        <h1>THE VAULT</h1>
-        <p>Your private portal for academic "research" and high-performance simulations.</p>
-        <button class="enter-btn" onclick="showGames()">GAMES</button>
+        <h1>Water Education v0.1</h1>
+        <p>Explore interactive modules and high-precision physical simulations designed for advanced learning environments.</p>
+        <button class="enter-btn" onclick="openVault()">Enter Games</button>
     </div>
 
     <div id="game-section">
-        <h2 style="color: #00d2ff; font-size: 2rem;">Game Library</h2>
+        <h2 style="color: #38bdf8; font-size: 2.2rem; margin-top: 0;">Simulation Directory</h2>
         
         <div class="game-grid">
             
@@ -135,7 +140,7 @@
                 <div class="game-info">
                     <div class="game-title">Celeste Classic</div>
                 </div>
-                <div class="description-overlay">Precision platforming at its finest. Reach the summit.</div>
+                <div class="description-overlay">Test your reaction speed and precision in this high-altitude climbing simulation.</div>
             </a>
 
             <a href="buckshot-roulette-game.html" class="game-card">
@@ -143,26 +148,35 @@
                 <div class="game-info">
                     <div class="game-title">Buckshot Roulette</div>
                 </div>
-                <div class="description-overlay">A gritty game of strategy and nerves.</div>
+                <div class="description-overlay">A game of probability and logic. Calculated risks only.</div>
             </a>
+
+            <div class="game-card" style="opacity: 0.4; cursor: default;">
+                <div style="height: 180px; display: flex; align-items: center; justify-content: center; font-size: 50px; background: #1e293b;">?</div>
+                <div class="game-info">
+                    <div class="game-title">More Loading...</div>
+                </div>
+            </div>
 
         </div>
     </div>
 
     <script>
-        function showGames() {
-            // Hide the welcome screen
+        function openVault() {
+            // Fade out the welcome text
             const welcome = document.getElementById('welcome-screen');
-            welcome.classList.add('fade-out');
+            welcome.classList.add('hidden-fade');
 
-            // Show the game section after a short delay for animation
+            // Wait for fade to finish, then show the grid
             setTimeout(() => {
                 welcome.style.display = 'none';
                 const games = document.getElementById('game-section');
-                games.classList.add('fade-in');
-                // Change body to allow scrolling once games appear
-                document.body.style.display = 'block';
-            }, 600);
+                games.classList.add('show-content');
+                
+                // Set body to start at the top for the new section
+                document.body.style.alignItems = 'flex-start';
+                window.scrollTo(0, 0);
+            }, 800);
         }
     </script>
 
