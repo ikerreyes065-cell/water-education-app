@@ -569,3 +569,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 });
+
+// Forzar el inicio automático al cargar la ventana
+window.onload = function() {
+    const btn = document.getElementById('start-simulation');
+    if(btn) btn.click();
+};
