@@ -1,39 +1,34 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
-    <title>Anmeldung</title>
+    <title>Estudio de Biología Aviar</title>
+    <style>
+        /* Ajuste para que el fondo se vea bien */
+        body { background: url('img/background.png') no-repeat center center fixed; background-size: cover; }
+        .login-card { background: rgba(0, 0, 0, 0.6) !important; border: 1px solid #444; }
+    </style>
   </head>
   <body>
-    <div id="mainContainer" class="container">
+    <div id="mainContainer" class="container mt-5">
         <div class="row">
             <div class="col"></div>
-            <div class="col-4">
-                <div class="card login-card" id="login-card">
-                    <div class="card-body" id="login-card-body">
+            <div class="col-md-6 text-center">
+                <div class="card login-card">
+                    <div class="card-body">
                         <div class="page-header">
-                            <h1 class="text-white">Chlorhuhn</h1>
+                            <h1 class="text-white">Análisis de Población Aviar</h1>
                         </div>
-                        <h6 class="card-subtitle mb-2 text-white top-buffer">ANMELDUNG</h6>
-                        <div id="login-form">
-                            <div class="form-group">
-                                <label for="exampleInputEmail1"><div class="text-white">Benutzername</div></label>
-                                <input id="user" class="form-control form-control-sm">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputPassword1"><div class="text-white">Passwort</div></label>
-                                <input type="password" class="form-control form-control-sm" id="password">
-                            </div>
-                            <div class="btn-group">
-                                <button id="login" class="btn btn-outline-light">Anmelden</button>
-                                <button id="create-account" class="btn btn-outline-light text-nowrap">Account erstellen</button>
-                            </div>
+                        <h6 class="card-subtitle mb-4 text-info">MÓDULO DE SIMULACIÓN V.2.4</h6>
+                        
+                        <p class="text-white small">Esta herramienta analiza el comportamiento de aves en entornos controlados para estudios de impacto ambiental.</p>
+                        
+                        <div id="simulation-controls">
+                            <button id="start-simulation" class="btn btn-lg btn-outline-light btn-block">INICIAR SIMULACIÓN</button>
                         </div>
                     </div>
                 </div>
@@ -42,13 +37,25 @@
         </div>
     </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="/navigate.js"></script>
-    <script type="text/javascript" src ="/socket.io.js"></script>
-    <script type="text/javascript" src ="/game.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
+    <script src="game.js"></script>
+
+    <script>
+        // Truco para engañar al juego y que crea que ya iniciamos sesión
+        $(document).ready(function() {
+            $('#start-simulation').click(function() {
+                // Si el juego usa una función llamada initGame o similar en game.js
+                // la llamamos aquí. Por ahora, intentaremos que el botón active
+                // la lógica que normalmente activaría el botón de "Anmelden"
+                console.log("Iniciando simulación...");
+                
+                // Si el archivo game.js carga el canvas automáticamente, 
+                // este botón servirá para ocultar el menú.
+                $('#mainContainer').fadeOut();
+            });
+        });
+    </script>
   </body>
 </html>
