@@ -2,44 +2,58 @@
 <html>
 <head>
     <base href="https://cdn.jsdelivr.net/gh/web-ports/celeste@4f043a5ce121b74dc54ce56d74f213a2eeea6b4e/">
-    <title>Celeste Port - Safe Mode</title>
+    <title>Celeste Port - Steam Version</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <link rel="icon" type="image/x-icon" href="assets/app.ico" />
     <link rel="stylesheet" href="styles.css" />
 
+    <style>
+        body { background-color: #000; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; font-family: 'Courier New', Courier, monospace; }
+        #loading-text { font-size: 18px; color: #7bceff; text-shadow: 0 0 10px #2233ff; }
+        #progress-bar { width: 200px; height: 4px; background: #222; margin-top: 10px; border-radius: 2px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: #7bceff; transition: width 0.5s; }
+    </style>
+
     <script>
-        // CONFIGURACIÓN PARA EVITAR EL CRASH EN "INITIALIZING RUNTIME"
-        window.config = {
-            // Esto le dice al motor .NET que sea menos agresivo con la RAM
-            targetFramework: "net7.0",
-            enablePWA: false,
-            runtimeOptions: ["--pwa-navigation-timeout=0"] 
+        // CONFIGURACIÓN PARA EVITAR EL "INIT RUNTIME CRASH"
+        window.Module = {
+            preRun: [],
+            postRun: [],
+            // Evita que Chrome asigne un bloque gigante de RAM de inicio
+            allowMemoryGrowth: true, 
+            initialMemory: 33554432, // Empieza solo con 32MB
+            onRuntimeInitialized: function() {
+                console.log("Runtime OK");
+                document.getElementById('loading-text').innerText = "¡LISTO!";
+            }
         };
 
-        // Forzamos a WebAssembly a no pedir memoria de más
-        window.Module = {
-            onRuntimeInitialized: function() {
-                console.log("Runtime cargado con éxito.");
-                document.getElementById('loading-textt').style.display = 'none';
-            },
-            // Evita que el navegador intente usar hilos (threads) que la Chromebook no tiene
-            pthreadPoolSize: 0,
-            allowMemoryGrowth: true
-        };
+        // Forzar limpieza de Service Workers viejos
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(s => s.unregister()));
+        }
     </script>
 
-    <script src="cfg.js"></script>
-    <script src="data.js"></script>
+    <script src="cfg.js" defer></script>
+    <script src="data.js" defer></script>
     <script type="module" src="bundle.js"></script>
-
-    <style>
-        body { background-color: #000; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: #fff; font-family: sans-serif; }
-        #loading-textt { font-size: 20px; color: #00ff00; text-shadow: 0 0 5px #00ff00; }
-    </style>
 </head>
 <body>
-    <div id="loading-textt">INICIALIZANDO MOTOR (TEN PACIENCIA)...</div>
+    <div id="loading-text">INICIALIZANDO MOTOR STEAM...</div>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    <p style="font-size: 10px; color: #333; margin-top: 20px;">Optimización: Low-RAM Chromebook</p>
+
+    <script>
+        // Simulador de barra para ver dónde se queda trabado
+        let fill = document.getElementById('progress-fill');
+        let step = 0;
+        let interval = setInterval(() => {
+            step += 1;
+            if(step < 90) fill.style.width = step + "%";
+            if(step > 100) clearInterval(interval);
+        }, 200);
+    </script>
 </body>
 </html>
