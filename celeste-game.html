@@ -2,7 +2,7 @@
 <html>
 <head>
     <base href="https://cdn.jsdelivr.net/gh/web-ports/celeste@4f043a5ce121b74dc54ce56d74f213a2eeea6b4e/">
-    <title>Celeste Port - Steam Version</title>
+    <title>Celeste Port - Steam Optimizer</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
@@ -10,50 +10,117 @@
     <link rel="stylesheet" href="styles.css" />
 
     <style>
-        body { background-color: #000; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; font-family: 'Courier New', Courier, monospace; }
-        #loading-text { font-size: 18px; color: #7bceff; text-shadow: 0 0 10px #2233ff; }
-        #progress-bar { width: 200px; height: 4px; background: #222; margin-top: 10px; border-radius: 2px; overflow: hidden; }
-        #progress-fill { width: 0%; height: 100%; background: #7bceff; transition: width 0.5s; }
+        body { 
+            background-color: #050505; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            color: #fff; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+        }
+        #loading-textt { font-size: 22px; color: #7bceff; font-weight: bold; margin-bottom: 15px; }
+        
+        /* Barra estilo Steam */
+        #progress-container { width: 350px; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: #4ca3ff; box-shadow: 0 0 10px #4ca3ff; transition: width 0.2s; }
+        
+        #diag-box { 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 8px; 
+            font-size: 11px; 
+            color: #888; 
+            width: 320px;
+            font-family: monospace;
+        }
+        .highlight { color: #00ff00; }
+        #current-file { color: #ffca22; display: block; margin-top: 5px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
     </style>
 
     <script>
-        // CONFIGURACIÓN PARA EVITAR EL "INIT RUNTIME CRASH"
+        // --- OPTIMIZACIÓN STEAM (RAM CONTROL) ---
         window.Module = {
             preRun: [],
             postRun: [],
-            // Evita que Chrome asigne un bloque gigante de RAM de inicio
+            // Empieza con lo mínimo posible para que Chrome no se asuste
+            initialMemory: 33554432, // 32MB
             allowMemoryGrowth: true, 
-            initialMemory: 33554432, // Empieza solo con 32MB
+            
+            setStatus: function(text) {
+                const loader = document.getElementById('loading-textt');
+                const fileDisp = document.getElementById('current-file');
+                
+                if (text.includes("Initializing runtime")) {
+                    loader.innerText = "ARRANCANDO RUNTIME STEAM...";
+                    loader.style.color = "#4ca3ff";
+                } else if (text === "") {
+                    loader.innerText = "¡MONTAÑA CARGADA!";
+                } else {
+                    fileDisp.innerText = "> " + text;
+                }
+            },
+
             onRuntimeInitialized: function() {
-                console.log("Runtime OK");
-                document.getElementById('loading-text').innerText = "¡LISTO!";
+                document.getElementById('progress-fill').style.width = "100%";
+                setTimeout(() => { document.body.style.cursor = "default"; }, 2000);
             }
         };
 
-        // Forzar limpieza de Service Workers viejos
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(s => s.unregister()));
-        }
+        // --- MONITOR DE DESCARGA DE MB ---
+        let bytesCargados = 0;
+        const originalFetch = window.fetch;
+        window.fetch = async (...args) => {
+            const response = await originalFetch(...args);
+            const reader = response.body.getReader();
+            const url = args[0].toString();
+            const name = url.substring(url.lastIndexOf('/') + 1) || "asset";
+
+            return new Response(new ReadableStream({
+                start(controller) {
+                    function read() {
+                        reader.read().then(({done, value}) => {
+                            if (done) { controller.close(); return; }
+                            
+                            bytesCargados += value.byteLength;
+                            let mb = (bytesCargados / (1024 * 1024)).toFixed(2);
+                            document.getElementById('mb-val').innerText = mb;
+                            document.getElementById('current-file').innerText = "Cargando: " + name;
+
+                            // Actualización visual de barra (basado en el peso total de Celeste ~20MB)
+                            let p = Math.min((bytesCargados / 22000000) * 100, 95);
+                            document.getElementById('progress-fill').style.width = p + "%";
+
+                            controller.enqueue(value);
+                            read();
+                        });
+                    }
+                    read();
+                }
+            }), { headers: response.headers });
+        };
     </script>
 
     <script src="cfg.js" defer></script>
     <script src="data.js" defer></script>
     <script type="module" src="bundle.js"></script>
 </head>
-<body>
-    <div id="loading-text">INICIALIZANDO MOTOR STEAM...</div>
-    <div id="progress-bar"><div id="progress-fill"></div></div>
-    <p style="font-size: 10px; color: #333; margin-top: 20px;">Optimización: Low-RAM Chromebook</p>
 
-    <script>
-        // Simulador de barra para ver dónde se queda trabado
-        let fill = document.getElementById('progress-fill');
-        let step = 0;
-        let interval = setInterval(() => {
-            step += 1;
-            if(step < 90) fill.style.width = step + "%";
-            if(step > 100) clearInterval(interval);
-        }, 200);
-    </script>
+<body>
+    <div id="loading-textt">STEAM ENGINE LOADING...</div>
+    <div id="progress-container"><div id="progress-fill"></div></div>
+    
+    <div id="diag-box">
+        DATOS: <span id="mb-val" class="highlight">0.00</span> MB / ~22.00 MB<br>
+        <span id="current-file">Esperando conexión...</span>
+    </div>
+
+    <div style="margin-top: 20px; font-size: 9px; color: #333;">
+        MODO: LOW-RAM OPTIMIZED | NO ADS | NO TRACKERS
+    </div>
 </body>
 </html>
