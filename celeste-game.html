@@ -2,7 +2,7 @@
 <html>
 <head>
     <base href="https://cdn.jsdelivr.net/gh/web-ports/celeste@4f043a5ce121b74dc54ce56d74f213a2eeea6b4e/">
-    <title>Celeste Port - Emergency Lite</title>
+    <title>Celeste Port - Safe Mode</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
@@ -10,21 +10,24 @@
     <link rel="stylesheet" href="styles.css" />
 
     <script>
-        // CONFIGURACIÓN DE MEMORIA PARA CHROMEBOOKS VIEJAS
-        window.Module = {
-            preRun: [],
-            postRun: [],
-            // Forzamos un límite de memoria para que Chrome no mate la pestaña
-            TOTAL_MEMORY: 268435456, // 256MB fijos
-            print: (function() { return function(text) { console.log(text); }; })(),
-            printErr: function(text) { console.warn(text); },
-            setStatus: function(text) { console.log("Status: " + text); }
+        // CONFIGURACIÓN PARA EVITAR EL CRASH EN "INITIALIZING RUNTIME"
+        window.config = {
+            // Esto le dice al motor .NET que sea menos agresivo con la RAM
+            targetFramework: "net7.0",
+            enablePWA: false,
+            runtimeOptions: ["--pwa-navigation-timeout=0"] 
         };
 
-        // Limpieza de workers para evitar el crash de la "segunda vez"
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(r => r.forEach(s => s.unregister()));
-        }
+        // Forzamos a WebAssembly a no pedir memoria de más
+        window.Module = {
+            onRuntimeInitialized: function() {
+                console.log("Runtime cargado con éxito.");
+                document.getElementById('loading-textt').style.display = 'none';
+            },
+            // Evita que el navegador intente usar hilos (threads) que la Chromebook no tiene
+            pthreadPoolSize: 0,
+            allowMemoryGrowth: true
+        };
     </script>
 
     <script src="cfg.js"></script>
@@ -32,11 +35,11 @@
     <script type="module" src="bundle.js"></script>
 
     <style>
-        body { background-color: #000; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: #333; font-family: sans-serif; }
-        #loading-textt { color: #555; font-size: 18px; }
+        body { background-color: #000; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: #fff; font-family: sans-serif; }
+        #loading-textt { font-size: 20px; color: #00ff00; text-shadow: 0 0 5px #00ff00; }
     </style>
 </head>
 <body>
-    <div id="loading-textt">CARGANDO...</div>
+    <div id="loading-textt">INICIALIZANDO MOTOR (TEN PACIENCIA)...</div>
 </body>
 </html>
