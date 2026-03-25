@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE VAULT - Sketch Edition</title>
+    <title>THE VAULT - Premium Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,15 +11,12 @@
             --secondary: #a855f7;
             --accent: #f43f5e;
             --bg: #030712;
-            --card-bg: #111827;
-            --flipbook: 0.2s steps(4);
+            --card-bg: rgba(30, 41, 59, 0.7);
         }
 
         body { 
             font-family: 'Outfit', sans-serif; 
             background-color: var(--bg);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M10,10 Q20,15 30,10 T50,15 Q60,10 70,15 T90,10' stroke='%231f2937' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-            background-size: 150px 150px;
             color: #f1f5f9; 
             margin: 0; 
             display: flex;
@@ -29,118 +26,132 @@
             overflow-x: hidden;
         }
 
+        /* Mouse Follower Glow */
         #cursor-glow {
             position: fixed;
             top: 0; left: 0;
-            width: 400px; height: 400px;
+            width: 600px; height: 600px;
             background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
             z-index: -1;
+            transition: width 0.3s, height 0.3s;
         }
 
-        /* WELCOME PANEL */
+        /* Welcome Screen UI */
         #welcome-screen {
             text-align: center;
-            max-width: 550px;
-            padding: 50px;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 600px;
+            padding: 60px;
             background: var(--card-bg);
-            border: 5px solid var(--primary);
-            border-radius: 50% 50% 45% 55% / 40% 60% 40% 60%;
-            box-shadow: 15px 15px 0px #000;
-            transition: transform 0.4s steps(5), opacity 0.3s;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
             font-size: 4rem;
+            font-weight: 900;
             margin: 0;
-            color: var(--primary);
-            text-shadow: 4px 4px 0px #000;
-            animation: wobble 0.4s infinite linear;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
         }
 
         .enter-btn {
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            border: 4px solid #fff;
-            padding: 18px 45px;
-            font-size: 1.4rem;
-            font-weight: 900;
-            border-radius: 50px;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            border-radius: 20px;
             cursor: pointer;
-            margin-top: 25px;
-            box-shadow: 0 8px 0 #9f1239;
-            transition: 0.1s steps(2);
+            transition: 0.3s all;
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+            margin-top: 30px;
         }
 
-        .enter-btn:hover { transform: scale(1.1) rotate(-3deg); background: var(--primary); box-shadow: 0 8px 0 #0891b2; }
-        .enter-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #000; }
+        .enter-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 30px rgba(168, 85, 247, 0.4);
+        }
 
-        /* LIBRARY SECTION */
+        /* Game Section */
         #game-section {
-            display: none;
+            display: none; 
+            opacity: 0;
             width: 90%;
-            max-width: 1200px;
-            padding: 40px 0;
+            max-width: 1300px;
+            padding: 60px 20px;
             text-align: center;
+        }
+
+        .vault-header {
+            font-size: 5rem;
+            font-weight: 900;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+            letter-spacing: -4px;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
         }
 
         .game-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-            gap: 25px; 
-            margin-top: 40px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 30px; 
         }
 
         .game-card { 
             background: var(--card-bg); 
-            border: 4px solid var(--secondary);
-            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border-radius: 24px; 
             overflow: hidden; 
+            position: relative; 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border: 1px solid rgba(255,255,255,0.1);
             text-decoration: none; 
             display: block; 
-            /* Start hidden for the JS to pop them in */
-            opacity: 0; 
-            transform: translateY(40px) scale(0.8);
-            box-shadow: 8px 8px 0px #000;
-            transition: border-color var(--flipbook), transform var(--flipbook);
+            opacity: 0; /* Handled by JS animation */
+            transform: translateY(30px);
         }
 
         .game-card:hover { 
-            transform: translateY(-10px) rotate(2deg);
-            border-color: #fff;
-            animation: wobble 0.3s infinite;
-            z-index: 5;
+            transform: translateY(-15px) scale(1.03); 
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            z-index: 10;
         }
 
-        .game-img { width: 100%; height: 150px; object-fit: cover; border-bottom: 4px solid #000; }
+        .game-img { width: 100%; height: 160px; object-fit: cover; transition: 0.5s; }
+        .game-card:hover .game-img { transform: scale(1.1); filter: brightness(1.2); }
 
-        .game-info { padding: 15px; text-align: left; background: #0f172a; }
-        .game-title { font-weight: 900; color: #fff; font-size: 1.1rem; }
+        .game-info { padding: 20px; text-align: left; background: rgba(15, 23, 42, 0.8); }
+        .game-title { font-weight: 900; font-size: 1.2rem; color: #fff; }
 
+        /* Smooth Overlay */
         .description-overlay {
             position: absolute; inset: 0;
-            background: #fff; color: #000;
+            background: linear-gradient(to top, rgba(56, 189, 248, 0.9), rgba(168, 85, 247, 0.9));
+            color: #fff;
             display: flex; align-items: center; justify-content: center;
-            padding: 15px; opacity: 0;
-            font-weight: 900; text-align: center;
-            transform: scale(0.5) rotate(-10deg);
-            transition: var(--flipbook);
+            padding: 25px; opacity: 0;
+            transition: 0.4s;
+            font-weight: 700; text-align: center; font-size: 1.1rem;
+            transform: translateY(100%);
         }
 
-        .game-card:hover .description-overlay { opacity: 1; transform: scale(1) rotate(0deg); }
+        .game-card:hover .description-overlay { opacity: 1; transform: translateY(0); }
 
-        /* ANIMATIONS */
-        @keyframes wobble {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(-1deg) translate(-1px, 1px); }
-            75% { transform: rotate(1deg) translate(1px, -1px); }
-            100% { transform: rotate(0deg); }
-        }
+        .show-content { display: block !important; opacity: 1 !important; }
 
-        @keyframes cardEnter {
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes cardPop {
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -150,14 +161,14 @@
 
     <div id="welcome-screen">
         <h1>THE VAULT</h1>
-        <p style="color: #94a3b8; font-weight: bold;">v1.0 • HAND-DRAWN EDITION</p>
-        <button class="enter-btn" onclick="openVault()">ENTER VAULT</button>
+        <p style="font-size: 1.2rem; color: #94a3b8; margin-top: 15px;">v1.0 • Security Cleared • Ready to Play</p>
+        <button class="enter-btn" onclick="openVault()">ACCESS FILES</button>
     </div>
 
     <div id="game-section">
-        <h2 style="font-size: 3rem; text-shadow: 4px 4px 0 var(--accent);">🕹️ LIBRARY v1.0</h2>
-        <div class="game-grid" id="main-grid">
-            
+        <h2 class="vault-header">LIBRARY</h2>
+        
+        <div class="game-grid">
             <a href="celeste-game.html" class="game-card">
                 <img src="celeste-thumb.jpeg" class="game-img" />
                 <div class="game-info"><div class="game-title">🏔️ Celeste Classic</div></div>
@@ -167,13 +178,55 @@
             <a href="buckshot-roulette-game.html" class="game-card">
                 <img src="buckshot.jpeg" class="game-img" />
                 <div class="game-info"><div class="game-title">🔫 Buckshot Roulette</div></div>
-                <div class="description-overlay">VERY SCARY! 💀</div>
+                <div class="description-overlay">A high-stakes gamble for your soul. 💀</div>
+            </a>
+
+            <a href="crazy-chicken-game.html" class="game-card">
+                <img src="crazy.jpeg" class="game-img" />
+                <div class="game-info"><div class="game-title">🐔 Crazy Chicken 3D</div></div>
+                <div class="description-overlay">Absolute poultry chaos. 🥚</div>
+            </a>
+
+            <a href="Meatboy.html" class="game-card">
+                <img src="meat.jpeg" class="game-img" />
+                <div class="game-info"><div class="game-title">🥩 Super Meat Boy</div></div>
+                <div class="description-overlay">Precision platforming at its bloodiest. ⚙️</div>
+            </a>
+
+            <a href="cuphead-game.html" class="game-card">
+                <img src="cuphead.png" class="game-img" />
+                <div class="game-info"><div class="game-title">☕ Cuphead</div></div>
+                <div class="description-overlay">Don't deal with the Devil. 😈</div>
+            </a>
+
+            <a href="hollow-knight.html" class="game-card">
+                <img src="hollow.jpg" class="game-img" />
+                <div class="game-info"><div class="game-title">⚔️ Hollow Knight</div></div>
+                <div class="description-overlay">Explore the depths of Hallownest. 🐜</div>
+            </a>
+
+            <a href="Soundboard.html" class="game-card">
+                <img src="button.jpg" class="game-img" />
+                <div class="game-info"><div class="game-title">🔊 Soundboard</div></div>
+                <div class="description-overlay">Spam the memes. 📢</div>
             </a>
 
             <a href="isaac.html" class="game-card">
                 <img src="350.png" class="game-img" />
                 <div class="game-info"><div class="game-title">💧 The Binding of Isaac</div></div>
-                <div class="description-overlay">CRY TO WIN! 😭</div>
+                <div class="description-overlay">Roguelike tears and basement fears. 😭</div>
+            </a>
+
+            <a href="bounce.html" class="game-card">
+                <img src="437.png" class="game-img" />
+                <div class="game-info"><div class="game-title">🐧 Bouncemasters</div></div>
+                <div class="description-overlay">Launch that penguin to the moon! 🚀</div>
+            </a>
+
+            <a href="cookie.html" class="game-card">
+                <img src="82.png" class="game-img" />
+                <div class="game-info"><div class="game-title">🍪 Cookie Clicker</div></div>
+                <div class="description-overlay">The cookies must flow. 🖱️</div>
             </a>
 
             <a href="undertale/UNDERTALE.html" class="game-card">
@@ -181,14 +234,7 @@
                 <div class="game-info"><div class="game-title">❤️ UNDERTALE</div></div>
                 <div class="description-overlay">DETERMINATION. 💀</div>
             </a>
-
-            <a href="cookie.html" class="game-card">
-                <img src="82.png" class="game-img" />
-                <div class="game-info"><div class="game-title">🍪 Cookie Clicker</div></div>
-                <div class="description-overlay">CLICK THE COOKIE! 🖱️</div>
-            </a>
-
-            </div>
+        </div>
     </div>
 
     <script>
@@ -199,34 +245,25 @@
             glow.style.top = e.clientY + 'px';
         });
 
-        // The "Fix-It" function for your console error
-        function toggleWASD() {
-            console.log("WASD Function initialized.");
-        }
-
         function openVault() {
             const welcome = document.getElementById('welcome-screen');
-            const section = document.getElementById('game-section');
-            
-            // 1. Hide Welcome with a "jumpy" scale
-            welcome.style.transform = 'scale(0) rotate(15deg)';
+            welcome.style.transform = 'scale(0.8) translateY(-100px)';
             welcome.style.opacity = '0';
 
             setTimeout(() => {
                 welcome.style.display = 'none';
-                section.style.display = 'block';
-                document.body.style.alignItems = 'flex-start';
-
-                // 2. Animate cards one-by-one
+                const section = document.getElementById('game-section');
+                section.classList.add('show-content');
+                
+                // Staggered card animation
                 const cards = document.querySelectorAll('.game-card');
                 cards.forEach((card, index) => {
-                    setTimeout(() => {
-                        card.style.animation = `cardEnter 0.4s steps(5) forwards`;
-                    }, index * 100); 
+                    card.style.animation = `cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${index * 0.1}s forwards`;
                 });
 
+                document.body.style.alignItems = 'flex-start';
                 window.scrollTo({top: 0, behavior: 'smooth'});
-            }, 400);
+            }, 600);
         }
     </script>
 </body>
