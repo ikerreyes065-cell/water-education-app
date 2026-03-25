@@ -10,7 +10,7 @@
     <title>UNDERTALE</title>
     
     <link rel="icon" type="image/x-icon" href="https://undertale.win/play/fav.ico">
-    <link rel="stylesheet" href="https://undertale.win/play/UNDERTALE_files/ut.css">
+    <link rel="stylesheet" href="./UNDERTALE_files/ut.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
@@ -52,13 +52,13 @@
                 <button class="output-button" onclick="window.enterPositionMode()">Position Controls?</button>
                 <button class="output-button" onclick="toggleDpadMode()">Toggle D-Pad / Joystick!</button>
             </div>
-            <button class="output-button" id="fullscreen">Toggle Fullscreen?</button>
+            <button class="output-button" id="fullscreen" onclick="toggleFullscreen()">Toggle Fullscreen?</button>
             <button class="output-button" onclick="toggleConsole()">Toggle Console!</button>
             <button class="output-button" id="stats-button" onclick="toggleFPS()">Toggle FPS Counter!</button>
             <button class="output-button" onclick="window.SAVEManager.openSAVEManager()">SAVE Manager!</button>
             <button class="output-button" onclick="toggleWASD(this)">Mirror WASD to Arrows!</button>
             <input id="colorpicker" type="color" onchange="changecolor(this)">
-            <textarea id="output"></textarea>
+            <textarea id="output" style="display:none;"></textarea>
         </div>
 
         <button id="closeUIButton" onclick="hideUI()">×</button>
@@ -96,74 +96,98 @@
     </div>
 
     <script>
-        // Detection for Mobile
-        window.addEventListener('load', () => {
-            const mobileButtons = document.getElementById('mobile-buttons');
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                mobileButtons.style.display = 'block';
-            }
-        });
-
-        // Key Mirroring Logic (WASD/Shift/Control)
+        // --- 1. KEY MIRRORING (WASD & UT KEYS) ---
         (function() {
-            const mapping = { "Shift": "x", "Control": "c", "Meta": "c" };
+            const mapping = { 
+                "w": "ArrowUp", "W": "ArrowUp",
+                "a": "ArrowLeft", "A": "ArrowLeft",
+                "s": "ArrowDown", "S": "ArrowDown",
+                "d": "ArrowRight", "D": "ArrowRight",
+                "Shift": "x", "Control": "c", "Meta": "c" 
+            };
             const activeSynthetic = new Map();
-            let mirroringEnabled = true;
+            let mirroringEnabled = false;
 
-            function dispatchSynthetic(type, syntheticKey) {
-                const target = document.activeElement && document.activeElement !== document.body ? document.activeElement : document;
-                const keyCode = syntheticKey.toUpperCase().charCodeAt(0);
-                const ev = new KeyboardEvent(type, {
-                    key: syntheticKey,
-                    code: "Key" + syntheticKey.toUpperCase(),
-                    keyCode: keyCode,
-                    which: keyCode,
-                    bubbles: true
-                });
-                target.dispatchEvent(ev);
+            window.toggleWASD = function(btn) {
+                mirroringEnabled = !mirroringEnabled;
+                btn.innerText = mirroringEnabled ? "Stop Mirroring WASD!" : "Mirror WASD to Arrows!";
+            };
+
+            function dispatchSynthetic(type, key) {
+                const ev = new KeyboardEvent(type, { key: key, bubbles: true });
+                document.dispatchEvent(ev);
             }
 
             window.addEventListener("keydown", (e) => {
-                if (!e.isTrusted || !mirroringEnabled || !(e.key in mapping)) return;
-                e.preventDefault();
-                if (!activeSynthetic.has(e.key)) {
-                    activeSynthetic.set(e.key, { key: mapping[e.key], down: true });
-                    dispatchSynthetic("keydown", mapping[e.key]);
+                if (mirroringEnabled && mapping[e.key]) {
+                    if (!activeSynthetic.has(e.key)) {
+                        activeSynthetic.set(e.key, mapping[e.key]);
+                        dispatchSynthetic("keydown", mapping[e.key]);
+                    }
+                    e.preventDefault();
                 }
             }, true);
 
             window.addEventListener("keyup", (e) => {
-                if (!e.isTrusted || !mirroringEnabled || !(e.key in mapping)) return;
-                const state = activeSynthetic.get(e.key);
-                if (state) {
-                    e.preventDefault();
-                    dispatchSynthetic("keyup", state.key);
+                const targetKey = activeSynthetic.get(e.key);
+                if (targetKey) {
+                    dispatchSynthetic("keyup", targetKey);
                     activeSynthetic.delete(e.key);
+                    e.preventDefault();
                 }
             }, true);
         })();
 
-        // SAVE Manager Logic
-        window.SAVEManager = (function() {
-            return {
-                openSAVEManager: function() {
-                    document.getElementById('saveManagerModal').style.display = 'flex';
-                    console.log("Save Manager Opened");
-                },
-                closeSAVEManager: function() {
-                    document.getElementById('saveManagerModal').style.display = 'none';
-                    window.location.reload();
-                },
-                closeSMnoreload: function() {
-                    document.getElementById('saveManagerModal').style.display = 'none';
-                },
-                handleUpload: function() {
-                    console.log("Upload triggered");
-                }
-                // Note: Full IndexDB logic requires the game engine (Emscripten) to be running
-            };
-        })();
+        // --- 2. UI & UTILITY FUNCTIONS ---
+        window.hideUI = function() {
+            const container = document.getElementById('output-container');
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        };
+
+        window.toggleConsole = function() {
+            const out = document.getElementById('output');
+            out.style.display = out.style.display === 'none' ? 'block' : 'none';
+        };
+
+        window.toggleFPS = function() {
+            // Emscripten specific: this usually toggles the internal stats
+            if (typeof window.showStat !== 'undefined') {
+                window.showStat = !window.showStat;
+            } else {
+                console.log("FPS engine not yet loaded.");
+            }
+        };
+
+        window.toggleFullscreen = function() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        };
+
+        window.changecolor = function(input) {
+            document.body.style.backgroundColor = input.value;
+        };
+
+        // --- 3. SAVE MANAGER ---
+        window.SAVEManager = {
+            openSAVEManager: () => document.getElementById('saveManagerModal').style.display = 'flex',
+            closeSAVEManager: () => {
+                document.getElementById('saveManagerModal').style.display = 'none';
+                window.location.reload();
+            },
+            closeSMnoreload: () => document.getElementById('saveManagerModal').style.display = 'none',
+            handleUpload: () => console.log("Importing file..."),
+            exportAllToZip: () => console.log("Exporting saves...")
+        };
+
+        // --- 4. MOBILE DETECTION ---
+        window.addEventListener('load', () => {
+            if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                document.getElementById('mobile-buttons').style.display = 'block';
+            }
+        });
     </script>
-    
-    </body>
+</body>
 </html>
