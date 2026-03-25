@@ -229,6 +229,12 @@
                 <div class="description-overlay">Roguelike tears and basement fears. 😭</div>
             </a>
 
+            <a href="10minutes.html" class="game-card" data-cat="action">
+                <img src="430.png" class="game-img" />
+                <div class="game-info"><div class="game-title">🌑 10 Mins Till Dawn</div></div>
+                <div class="description-overlay">Survive the night, one bullet at a time. 🕯️</div>
+            </a>
+
             <a href="crazy-chicken-game.html" class="game-card" data-cat="extra">
                 <img src="crazy.jpeg" class="game-img" />
                 <div class="game-info"><div class="game-title">🐔 Crazy Chicken 3D</div></div>
@@ -281,10 +287,14 @@
 
         function animateCards() {
             const cards = document.querySelectorAll('.game-card');
-            cards.forEach((card, index) => {
-                card.style.animation = 'none';
-                card.offsetHeight; /* trigger reflow */
-                card.style.animation = `cardPop 0.7s var(--bounce) ${index * 0.08}s forwards`;
+            let visibleIndex = 0;
+            cards.forEach((card) => {
+                if(card.style.display !== 'none') {
+                    card.style.animation = 'none';
+                    card.offsetHeight; /* trigger reflow */
+                    card.style.animation = `cardPop 0.7s var(--bounce) ${visibleIndex * 0.08}s forwards`;
+                    visibleIndex++;
+                }
             });
         }
 
@@ -299,6 +309,8 @@
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(40px) scale(0.9)';
                 }
             });
             animateCards();
