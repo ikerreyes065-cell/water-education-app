@@ -2,79 +2,41 @@
 <html>
 <head>
     <base href="https://cdn.jsdelivr.net/gh/web-ports/celeste@4f043a5ce121b74dc54ce56d74f213a2eeea6b4e/">
-    <title>Celeste Port - Ultra Stable</title>
+    <title>Celeste Port - Emergency Lite</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <link rel="icon" type="image/x-icon" href="assets/app.ico" />
     <link rel="stylesheet" href="styles.css" />
 
-    <style>
-        body {
-            background-color: #000;
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: white;
-            font-family: sans-serif;
-        }
-        #loading-textt {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-        #sidebarad1, #sidebarad2 { display: none !important; }
-    </style>
-
     <script>
-        // TRUCO MAESTRO: Evita que Chrome use archivos de cache corruptos
-        // pero NO borra tus partidas guardadas.
+        // CONFIGURACIÓN DE MEMORIA PARA CHROMEBOOKS VIEJAS
+        window.Module = {
+            preRun: [],
+            postRun: [],
+            // Forzamos un límite de memoria para que Chrome no mate la pestaña
+            TOTAL_MEMORY: 268435456, // 256MB fijos
+            print: (function() { return function(text) { console.log(text); }; })(),
+            printErr: function(text) { console.warn(text); },
+            setStatus: function(text) { console.log("Status: " + text); }
+        };
+
+        // Limpieza de workers para evitar el crash de la "segunda vez"
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                }
-            });
+            navigator.serviceWorker.getRegistrations().then(r => r.forEach(s => s.unregister()));
         }
     </script>
 
     <script src="cfg.js"></script>
     <script src="data.js"></script>
     <script type="module" src="bundle.js"></script>
+
+    <style>
+        body { background-color: #000; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: #333; font-family: sans-serif; }
+        #loading-textt { color: #555; font-size: 18px; }
+    </style>
 </head>
-
 <body>
-    <div id="loading-textt">CARGANDO CELESTE...</div>
-    <p style="font-size: 10px; color: #444;">Modo: Memoria Protegida</p>
-
-    <script>
-        window.addEventListener('load', () => {
-            console.log("Instancia iniciada. Optimizando RAM...");
-            
-            // Si después de 20 segundos sigue el texto, es que algo falló
-            setTimeout(() => {
-                const loader = document.getElementById('loading-textt');
-                if (loader && loader.innerText !== "") {
-                    loader.innerHTML = "EL JUEGO ESTÁ TARDANDO... <br> <span style='font-size:12px'>Intenta cerrar otras pestañas</span>";
-                }
-            }, 20000);
-        });
-
-        // Este evento se dispara justo antes de que el juego inicie
-        window.addEventListener('blur', () => {
-            // Ayuda a la Chromebook a no morir si cambias de pestaña
-            console.log("Pestaña en segundo plano - Ahorrando recursos");
-        });
-    </script>
+    <div id="loading-textt">CARGANDO...</div>
 </body>
 </html>
