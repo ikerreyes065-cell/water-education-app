@@ -27,7 +27,6 @@
             overflow-x: hidden;
         }
 
-        /* Efecto de resplandor del cursor */
         #cursor-glow {
             position: fixed;
             top: 0; left: 0;
@@ -89,7 +88,7 @@
             box-shadow: 0 20px 40px rgba(168, 85, 247, 0.5);
         }
 
-        /* --- INTERFAZ DE CATEGORÍAS --- */
+        /* --- CATEGORÍAS --- */
         #game-section {
             display: none; 
             opacity: 0;
@@ -128,7 +127,7 @@
             box-shadow: 0 10px 20px rgba(56, 189, 248, 0.4);
         }
 
-        /* --- CUADRÍCULA DE JUEGOS --- */
+        /* --- CUADRÍCULA --- */
         .game-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -241,13 +240,19 @@
                 <div class="description-overlay">Sobrevive a la noche, bala a bala. 🕯️</div>
             </a>
 
-            <a href="alien-hominid.html" class="game-card" data-cat="action">
+            <a href="alien-hominid.html" class="game-card" data-cat="action" onmouseover="changeGlow('rgba(250, 204, 21, 0.25)')" onmouseout="changeGlow('rgba(168, 85, 247, 0.15)')">
                 <img src="304.png" class="game-img" />
                 <div class="game-info"><div class="game-title">👽 Alien Hominid</div></div>
                 <div class="description-overlay">¡Dispara y muerde cabezas! 🛸</div>
             </a>
 
-            <a href="clover-pit.html" class="game-card" data-cat="extra">
+            <a href="crossy-road/crossy.html" class="game-card" data-cat="extra" onmouseover="changeGlow('rgba(255, 255, 255, 0.2)')" onmouseout="changeGlow('rgba(168, 85, 247, 0.15)')">
+                <img src="crossy.jpeg" class="game-img" />
+                <div class="game-info"><div class="game-title">🐔 Crossy Road</div></div>
+                <div class="description-overlay">¿Por qué cruzó la calle el pollo? 🚙</div>
+            </a>
+
+            <a href="clover-pit.html" class="game-card" data-cat="extra" onmouseover="changeGlow('#4ade80')" onmouseout="changeGlow('rgba(168, 85, 247, 0.15)')">
                 <img src="716.png" class="game-img" />
                 <div class="game-info"><div class="game-title">🍀 Clover Pit</div></div>
                 <div class="description-overlay">Prueba tu suerte en el abismo. ✨</div>
@@ -299,9 +304,7 @@
                 welcome.style.display = 'none';
                 const section = document.getElementById('game-section');
                 section.classList.add('show-content');
-                
                 animateCards();
-
                 document.body.style.alignItems = 'flex-start';
                 window.scrollTo({top: 0, behavior: 'smooth'});
             }, 600);
@@ -313,7 +316,7 @@
             cards.forEach((card) => {
                 if(card.style.display !== 'none') {
                     card.style.animation = 'none';
-                    card.offsetHeight; /* trigger reflow */
+                    card.offsetHeight;
                     card.style.animation = `cardPop 0.7s var(--bounce) ${visibleIndex * 0.08}s forwards`;
                     visibleIndex++;
                 }
@@ -321,7 +324,6 @@
         }
 
         function filterGames(category, btn) {
-            // Actualizar botones
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
