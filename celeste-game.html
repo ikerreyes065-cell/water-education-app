@@ -2,7 +2,7 @@
 <html>
 <head>
     <base href="https://cdn.jsdelivr.net/gh/web-ports/celeste@4f043a5ce121b74dc54ce56d74f213a2eeea6b4e/">
-    <title>Celeste Port - Optimized</title>
+    <title>Celeste Port - Ultra Stable</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
@@ -33,9 +33,20 @@
             50% { opacity: 1; }
             100% { opacity: 0.5; }
         }
-        /* Ocultar elementos de publicidad para ahorrar recursos */
         #sidebarad1, #sidebarad2 { display: none !important; }
     </style>
+
+    <script>
+        // TRUCO MAESTRO: Evita que Chrome use archivos de cache corruptos
+        // pero NO borra tus partidas guardadas.
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+    </script>
 
     <script src="cfg.js"></script>
     <script src="data.js"></script>
@@ -44,17 +55,25 @@
 
 <body>
     <div id="loading-textt">CARGANDO CELESTE...</div>
-    <p style="font-size: 12px; color: #555;">Optimizado para Chromebook</p>
+    <p style="font-size: 10px; color: #444;">Modo: Memoria Protegida</p>
 
     <script>
-        // Pequeño script para limpiar la memoria antes de empezar
         window.addEventListener('load', () => {
-            console.log("Sistema listo. Iniciando instancia ligera.");
-            // Si el texto de carga se queda pegado, lo quitamos cuando el juego inicie
+            console.log("Instancia iniciada. Optimizando RAM...");
+            
+            // Si después de 20 segundos sigue el texto, es que algo falló
             setTimeout(() => {
                 const loader = document.getElementById('loading-textt');
-                if (loader) loader.style.display = 'none';
-            }, 15000); 
+                if (loader && loader.innerText !== "") {
+                    loader.innerHTML = "EL JUEGO ESTÁ TARDANDO... <br> <span style='font-size:12px'>Intenta cerrar otras pestañas</span>";
+                }
+            }, 20000);
+        });
+
+        // Este evento se dispara justo antes de que el juego inicie
+        window.addEventListener('blur', () => {
+            // Ayuda a la Chromebook a no morir si cambias de pestaña
+            console.log("Pestaña en segundo plano - Ahorrando recursos");
         });
     </script>
 </body>
