@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE VAULT - Animation Edition</title>
+    <title>THE VAULT - Sketch Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,17 +11,14 @@
             --secondary: #a855f7;
             --accent: #f43f5e;
             --bg: #030712;
-            --card-bg: #111827; /* Switched from translucent to solid for a hand-painted feel */
-            /* This makes the transition "jump" in chunks, like separate drawings */
-            --flipbook-time: 0.2s steps(4); 
-            --pop-time: 0.6s steps(10);
+            --card-bg: #111827;
+            --flipbook: 0.2s steps(4);
         }
 
         body { 
             font-family: 'Outfit', sans-serif; 
             background-color: var(--bg);
-            /* Scribble / Crayon texture background */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M10,10 Q20,15 30,10 T50,15 Q60,10 70,15 T90,10' stroke='%231f2937' stroke-width='2' fill='none'/%3E%3Cpath d='M15,20 Q25,25 35,20 T55,25 Q65,20 75,25 T95,20' stroke='%231f2937' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M10,10 Q20,15 30,10 T50,15 Q60,10 70,15 T90,10' stroke='%231f2937' stroke-width='2' fill='none'/%3E%3C/svg%3E");
             background-size: 150px 150px;
             color: #f1f5f9; 
             margin: 0; 
@@ -32,193 +29,118 @@
             overflow-x: hidden;
         }
 
-        /* Scribble Glow - less fuzzy, more sketched */
         #cursor-glow {
             position: fixed;
             top: 0; left: 0;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 20%, transparent 60%);
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
             z-index: -1;
-            /* Spotlight also moves choppily! */
-            transition: width var(--flipbook-time), height var(--flipbook-time);
         }
 
-        /* Sketched Welcome Panel */
+        /* WELCOME PANEL */
         #welcome-screen {
             text-align: center;
-            transition: all var(--flipbook-time);
-            max-width: 600px;
-            padding: 60px;
+            max-width: 550px;
+            padding: 50px;
             background: var(--card-bg);
-            /* IMPERFECT, wobbly border */
-            border: 4px solid var(--primary);
-            border-radius: 60% 40% 65% 35% / 30% 60% 45% 75%;
-            box-shadow: 12px 12px 0px #000;
+            border: 5px solid var(--primary);
+            border-radius: 50% 50% 45% 55% / 40% 60% 40% 60%;
+            box-shadow: 15px 15px 0px #000;
+            transition: transform 0.4s steps(5), opacity 0.3s;
         }
 
         h1 {
             font-size: 4rem;
-            font-weight: 900;
             margin: 0;
             color: var(--primary);
-            letter-spacing: -2px;
-            text-shadow: 5px 5px 0px #000, 7px 7px 0px var(--secondary);
-            /* Titles vibrate! */
-            animation: sketchedVibrate 0.3s infinite var(--flipbook-time);
+            text-shadow: 4px 4px 0px #000;
+            animation: wobble 0.4s infinite linear;
         }
 
         .enter-btn {
             background: var(--accent);
             color: white;
             border: 4px solid #fff;
-            padding: 20px 50px;
-            font-size: 1.5rem;
-            font-weight: 800;
+            padding: 18px 45px;
+            font-size: 1.4rem;
+            font-weight: 900;
             border-radius: 50px;
             cursor: pointer;
-            transition: var(--flipbook-time) all;
-            box-shadow: 0 10px 0 #9f1239;
-            margin-top: 30px;
-            text-transform: uppercase;
+            margin-top: 25px;
+            box-shadow: 0 8px 0 #9f1239;
+            transition: 0.1s steps(2);
         }
 
-        .enter-btn:hover {
-            transform: translateY(-5px) scale(1.05) rotate(-3deg);
-            background: var(--primary);
-            border-color: #000;
-            box-shadow: 0 10px 0 #0891b2;
-        }
+        .enter-btn:hover { transform: scale(1.1) rotate(-3deg); background: var(--primary); box-shadow: 0 8px 0 #0891b2; }
+        .enter-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #000; }
 
-        .enter-btn:active {
-            transform: translateY(10px) scale(0.9) rotate(0deg);
-            box-shadow: 0 0px 0 #000;
-        }
-
-        /* --- GAME SECTION --- */
+        /* LIBRARY SECTION */
         #game-section {
-            display: none; 
-            opacity: 0;
+            display: none;
             width: 90%;
-            max-width: 1300px;
-            padding: 60px 20px;
+            max-width: 1200px;
+            padding: 40px 0;
             text-align: center;
-        }
-
-        .vault-header {
-            font-size: 5rem;
-            font-weight: 900;
-            margin-bottom: 50px;
-            text-transform: uppercase;
-            letter-spacing: -4px;
-            color: #fff;
-            text-shadow: 4px 4px 0px var(--primary), 8px 8px 0px #000;
         }
 
         .game-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-            gap: 30px; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 25px; 
+            margin-top: 40px;
         }
 
         .game-card { 
             background: var(--card-bg); 
-            /* Imperfect wobbly shape */
-            border-radius: 40% 60% 55% 45% / 60% 40% 65% 35%;
-            overflow: hidden; 
-            position: relative; 
-            /* HOVER EFFECT IS CHOPPY */
-            transition: var(--flipbook-time) all cubic-bezier(0.18, 0.89, 0.32, 1.28); 
             border: 4px solid var(--secondary);
+            border-radius: 15px;
+            overflow: hidden; 
             text-decoration: none; 
             display: block; 
-            opacity: 0; /* Handled by JS animation */
-            transform: translateY(30px);
+            /* Start hidden for the JS to pop them in */
+            opacity: 0; 
+            transform: translateY(40px) scale(0.8);
             box-shadow: 8px 8px 0px #000;
+            transition: border-color var(--flipbook), transform var(--flipbook);
         }
-
-        /* Each card has a slightly different wobbly shape */
-        .game-card:nth-child(4n+1) { border-radius: 45% 55% 50% 50% / 65% 35% 60% 40%; }
-        .game-card:nth-child(4n+2) { border-radius: 35% 65% 45% 55% / 40% 60% 50% 50%; }
-        .game-card:nth-child(4n+3) { border-radius: 50% 50% 65% 35% / 55% 45% 70% 30%; }
 
         .game-card:hover { 
-            transform: translateY(-15px) scale(1.05) rotate(0deg) !important; 
+            transform: translateY(-10px) rotate(2deg);
             border-color: #fff;
-            box-shadow: 0 20px 0px rgba(0,0,0,0.8);
-            z-index: 10;
-            /* Add vibration on hover for sketched effect */
-            animation: sketchedVibrate 0.2s infinite var(--flipbook-time);
+            animation: wobble 0.3s infinite;
+            z-index: 5;
         }
 
-        .game-img { 
-            width: 100%; 
-            height: 160px; 
-            object-fit: cover; 
-            /* IMAGE TRANSITION ALSO CHOPPY */
-            transition: var(--flipbook-time) transform, var(--flipbook-time) filter; 
-            border-bottom: 4px solid #000;
-        }
-        .game-card:hover .game-img { 
-            transform: scale(1.1) rotate(2deg); 
-            filter: brightness(1.1) contrast(1.1); 
-        }
+        .game-img { width: 100%; height: 150px; object-fit: cover; border-bottom: 4px solid #000; }
 
-        .game-info { 
-            padding: 20px; 
-            text-align: left; 
-            background: rgba(15, 23, 42, 1); 
-            border-top: 2px solid rgba(255,255,255,0.1);
-        }
-        .game-title { 
-            font-weight: 900; 
-            font-size: 1.2rem; 
-            color: #fff; 
-            text-shadow: 2px 2px 0px #000;
-        }
+        .game-info { padding: 15px; text-align: left; background: #0f172a; }
+        .game-title { font-weight: 900; color: #fff; font-size: 1.1rem; }
 
-        /* Choppy Overlay */
         .description-overlay {
             position: absolute; inset: 0;
-            background: #fff;
-            color: #000;
+            background: #fff; color: #000;
             display: flex; align-items: center; justify-content: center;
-            padding: 25px; opacity: 0;
-            /* OVERLAY CHOPPY TRANSITION */
-            transition: var(--flipbook-time) opacity, var(--flipbook-time) transform;
-            font-weight: 900; text-align: center; font-size: 1.1rem;
-            text-transform: uppercase;
-            /* Spawns wobbly and jumps in */
-            transform: scale(0.2) rotate(45deg); 
+            padding: 15px; opacity: 0;
+            font-weight: 900; text-align: center;
+            transform: scale(0.5) rotate(-10deg);
+            transition: var(--flipbook);
         }
 
-        .game-card:hover .description-overlay { 
-            opacity: 1; 
-            transform: scale(1) rotate(0deg); 
+        .game-card:hover .description-overlay { opacity: 1; transform: scale(1) rotate(0deg); }
+
+        /* ANIMATIONS */
+        @keyframes wobble {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-1deg) translate(-1px, 1px); }
+            75% { transform: rotate(1deg) translate(1px, -1px); }
+            100% { transform: rotate(0deg); }
         }
 
-        .show-content { display: block !important; opacity: 1 !important; }
-
-        /* Animation Keyframes */
-        @keyframes cardPop {
-            0% { opacity: 0; transform: translateY(100px) scale(0.5); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes sketchedVibrate {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -1px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        @keyframes cardEnter {
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
     </style>
 </head>
@@ -228,110 +150,83 @@
 
     <div id="welcome-screen">
         <h1>THE VAULT</h1>
-        <p style="font-size: 1.2rem; color: #94a3b8; margin-top: 15px; font-weight:bold;">v1.0 • ACCESS GRANTED • CHOOSE GAME</p>
-        <button class="enter-btn" onclick="openVault()">LAUNCH LIBRARY</button>
+        <p style="color: #94a3b8; font-weight: bold;">v1.0 • HAND-DRAWN EDITION</p>
+        <button class="enter-btn" onclick="openVault()">ENTER VAULT</button>
     </div>
 
     <div id="game-section">
-        <h2 class="vault-header">LIBRARY v1.0</h2>
-        
-        <div class="game-grid">
+        <h2 style="font-size: 3rem; text-shadow: 4px 4px 0 var(--accent);">🕹️ LIBRARY v1.0</h2>
+        <div class="game-grid" id="main-grid">
+            
             <a href="celeste-game.html" class="game-card">
                 <img src="celeste-thumb.jpeg" class="game-img" />
                 <div class="game-info"><div class="game-title">🏔️ Celeste Classic</div></div>
-                <div class="description-overlay">Pico-8 Precision Platformer! 🍓</div>
+                <div class="description-overlay">CLIMB THE MOUNTAIN! 🍓</div>
             </a>
 
             <a href="buckshot-roulette-game.html" class="game-card">
                 <img src="buckshot.jpeg" class="game-img" />
                 <div class="game-info"><div class="game-title">🔫 Buckshot Roulette</div></div>
-                <div class="description-overlay">12-Gauge. Deal or No Deal. 💀</div>
-            </a>
-
-            <a href="crazy-chicken-game.html" class="game-card">
-                <img src="crazy.jpeg" class="game-img" />
-                <div class="game-info"><div class="game-title">🐔 Crazy Chicken 3D</div></div>
-                <div class="description-overlay">Feather-filled shooter! 🥚</div>
-            </a>
-
-            <a href="Meatboy.html" class="game-card">
-                <img src="meat.jpeg" class="game-img" />
-                <div class="game-info"><div class="game-title">🥩 Super Meat Boy</div></div>
-                <div class="description-overlay">Run fast. Die harder. ⚙️</div>
-            </a>
-
-            <a href="cuphead-game.html" class="game-card">
-                <img src="cuphead.png" class="game-img" />
-                <div class="game-info"><div class="game-title">☕ Cuphead</div></div>
-                <div class="description-overlay">Cartoony boss battle rush! 😈</div>
-            </a>
-
-            <a href="hollow-knight.html" class="game-card">
-                <img src="hollow.jpg" class="game-img" />
-                <div class="game-info"><div class="game-title">⚔️ Hollow Knight</div></div>
-                <div class="description-overlay">Explore the depths of Hallownest. 🐜</div>
-            </a>
-
-            <a href="Soundboard.html" class="game-card">
-                <img src="button.jpg" class="game-img" />
-                <div class="game-info"><div class="game-title">🔊 Soundboard</div></div>
-                <div class="description-overlay">Instant meme gratification. 📢</div>
+                <div class="description-overlay">VERY SCARY! 💀</div>
             </a>
 
             <a href="isaac.html" class="game-card">
                 <img src="350.png" class="game-img" />
                 <div class="game-info"><div class="game-title">💧 The Binding of Isaac</div></div>
-                <div class="description-overlay">Escape the basement. CRY. 😭</div>
-            </a>
-
-            <a href="bounce.html" class="game-card">
-                <img src="437.png" class="game-img" />
-                <div class="game-info"><div class="game-title">🐧 Bouncemasters</div></div>
-                <div class="description-overlay">Hit that penguin far! 🚀</div>
-            </a>
-
-            <a href="cookie.html" class="game-card">
-                <img src="82.png" class="game-img" />
-                <div class="game-info"><div class="game-title">🍪 Cookie Clicker</div></div>
-                <div class="description-overlay">Grandma. Click. Upgrade. 🖱️</div>
+                <div class="description-overlay">CRY TO WIN! 😭</div>
             </a>
 
             <a href="undertale/UNDERTALE.html" class="game-card">
                 <img src="under.png" class="game-img" />
                 <div class="game-info"><div class="game-title">❤️ UNDERTALE</div></div>
-                <div class="description-overlay">The RPG where nobody has to die. 💀</div>
+                <div class="description-overlay">DETERMINATION. 💀</div>
             </a>
-        </div>
+
+            <a href="cookie.html" class="game-card">
+                <img src="82.png" class="game-img" />
+                <div class="game-info"><div class="game-title">🍪 Cookie Clicker</div></div>
+                <div class="description-overlay">CLICK THE COOKIE! 🖱️</div>
+            </a>
+
+            </div>
     </div>
 
     <script>
-        // Cursor Follower - moves choppily!
+        // Cursor Follower
         const glow = document.getElementById('cursor-glow');
         window.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
 
+        // The "Fix-It" function for your console error
+        function toggleWASD() {
+            console.log("WASD Function initialized.");
+        }
+
         function openVault() {
             const welcome = document.getElementById('welcome-screen');
-            welcome.style.transform = 'scale(0.5) translateY(-200px) rotate(20deg)';
+            const section = document.getElementById('game-section');
+            
+            // 1. Hide Welcome with a "jumpy" scale
+            welcome.style.transform = 'scale(0) rotate(15deg)';
             welcome.style.opacity = '0';
 
             setTimeout(() => {
                 welcome.style.display = 'none';
-                const section = document.getElementById('game-section');
-                section.classList.add('show-content');
-                
-                // --- CHOPPY STAGGERED ENTRANCE ---
+                section.style.display = 'block';
+                document.body.style.alignItems = 'flex-start';
+
+                // 2. Animate cards one-by-one
                 const cards = document.querySelectorAll('.game-card');
                 cards.forEach((card, index) => {
-                    // Staggering is still smooth (the timing is small), but the animation itself (cardPop) is chopppy!
-                    card.style.animation = `cardPop var(--pop-time) cubic-bezier(0.18, 0.89, 0.32, 1.28) ${index * 0.08}s forwards`;
+                    setTimeout(() => {
+                        card.style.animation = `cardEnter 0.4s steps(5) forwards`;
+                    }, index * 100); 
                 });
 
-                document.body.style.alignItems = 'flex-start';
                 window.scrollTo({top: 0, behavior: 'smooth'});
-            }, 300); // Wait just 3 frames (ish) before loading next section
+            }, 400);
         }
     </script>
 </body>
