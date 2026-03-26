@@ -6,125 +6,104 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | Cuphead</title>
     <style>
-        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #231F20; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        #unity-container { width: 100%; height: 100%; position: absolute; }
-        #loading-overlay { 
-            position: fixed; inset: 0; background: #231F20; z-index: 10; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        html, body { 
+            margin: 0; padding: 0; height: 100%; overflow: hidden; 
+            background: #231F20; font-family: 'Courier New', Courier, monospace; 
         }
-        #progress-bar { width: 300px; height: 10px; background: #444; border-radius: 5px; margin-top: 20px; overflow: hidden; }
-        #progress-fill { width: 0%; height: 100%; background: #f43f5e; transition: width 0.2s; }
-        #loading-text { color: white; font-size: 24px; font-weight: bold; }
-        
-        /* Modal Style */
-        #warning-modal {
-            display: flex; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 100; align-items: center; justify-content: center;
+        #unityContainer { 
+            position: fixed; inset: 0; width: 100%; height: 100%; 
+            display: block; background: #231F20; 
         }
-        .modal-content {
-            background: #1e293b; padding: 30px; border-radius: 20px; text-align: center;
-            border: 2px solid #f43f5e; color: white; max-width: 400px;
+        #loading-text { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; font-size: 24px; text-align: center; z-index: 10;
+            background: rgba(0,0,0,0.8); padding: 20px; border-radius: 15px;
+            border: 2px solid #f43f5e;
         }
-        .kb-shortcut { background: #334155; padding: 2px 8px; border-radius: 5px; color: #38bdf8; font-family: monospace; }
-        .btn { background: #f43f5e; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 
 <body>
-    <div id="warning-modal">
-        <div class="modal-content">
-            <h2 style="color: #f43f5e;">⚠️ RECURSOS PESADOS (2GB)</h2>
-            <p>Este juego es gigante. Si la página se queda pegada o el Chromebook se reinicia, presiona:</p>
-            <p><span class="kb-shortcut">CTRL</span> + <span class="kb-shortcut">SHIFT</span> + <span class="kb-shortcut">R</span></p>
-            <button class="btn" onclick="startLoading()">EMPEZAR DESCARGA</button>
-        </div>
-    </div>
-
-    <div id="loading-overlay" style="display: none;">
-        <div id="loading-text">INICIALIZANDO...</div>
-        <div id="progress-bar"><div id="progress-fill"></div></div>
-        <p style="color: #888; font-size: 12px; margin-top: 10px;">Descargando 2.1 GB de datos...</p>
-    </div>
-
-    <div id="unity-container">
-        <canvas id="unity-canvas" style="width: 100%; height: 100%;"></canvas>
-    </div>
+    <div id="loading-text">INICIALIZANDO MOTOR...</div>
+    <div id="unityContainer"></div>
 
     <script src="Build/UnityLoader.js"></script>
+
     <script>
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const progressFill = document.getElementById('progress-fill');
-        const loadingText = document.getElementById('loading-text');
+        (async () => {
+            const loadingText = document.querySelector("#loading-text");
 
-        function startLoading() {
-            document.getElementById('warning-modal').style.display = 'none';
-            loadingOverlay.style.display = 'flex';
-            loadGame();
-        }
-
-        async function fetchWithProgress(url, label) {
-            const response = await fetch(url);
-            const reader = response.body.getReader();
-            const contentLength = +response.headers.get('Content-Length');
-            
-            let receivedLength = 0;
-            let chunks = []; 
-            
-            while(true) {
-                const {done, value} = await reader.read();
-                if (done) break;
-                chunks.push(value);
-                receivedLength += value.length;
+            // Function to fetch and merge the parts properly
+            async function fetchAndMerge(fileName, start, end, label) {
+                let chunks = [];
+                let totalLoaded = 0;
                 
-                // Update UI
-                const percent = (receivedLength / (1024 * 1024)).toFixed(1);
-                loadingText.innerText = `${label}: ${percent} MB`;
-                progressFill.style.width = `${(receivedLength / contentLength) * 100}%`;
+                for (let i = start; i <= end; i++) {
+                    const url = `Build/${fileName}.part${i}`;
+                    try {
+                        const response = await fetch(url, { mode: 'cors' });
+                        if (!response.ok) throw new Error();
+                        
+                        const buffer = await response.arrayBuffer();
+                        chunks.push(buffer);
+                        totalLoaded += buffer.byteLength;
+                        
+                        // Update Progress UI
+                        let mb = (totalLoaded / (1024 * 1024)).toFixed(1);
+                        loadingText.textContent = `DESCARGANDO ${label}: ${mb} MB`;
+                    } catch (e) {
+                        loadingText.textContent = "ERROR DE CONEXIÓN - REINTENTA";
+                        throw e;
+                    }
+                }
+
+                const blob = new Blob(chunks, { type: 'application/octet-stream' });
+                chunks = []; // Clear RAM
+                return URL.createObjectURL(blob);
             }
 
-            let blob = new Blob(chunks);
-            chunks = null; // FORCE MEMORY CLEANUP
-            return URL.createObjectURL(blob);
-        }
-
-        async function loadGame() {
             try {
-                // We load files one by one to keep RAM spikes low
-                // Note: The original code merged 102 parts. 
-                // To be TRULY optimized, we just fetch the main entry points.
-                
-                loadingText.innerText = "DESCARGANDO MOTOR...";
-                const wasmUrl = await fetchWithProgress("Build/Build.wasm.code.unityweb.part1", "WASM");
-                
-                loadingText.innerText = "DESCARGANDO DATOS (2GB)...";
-                // This is the heavy one. We use the actual data file.
-                const dataUrl = await fetchWithProgress("Build/Build.data.unityweb.part1", "DATA");
+                // 1. Download and merge all 107 total parts
+                const asmUrl = await fetchAndMerge("Build.asm.code.unityweb", 1, 3, "SISTEMA");
+                const wasmUrl = await fetchAndMerge("Build.wasm.code.unityweb", 1, 2, "MOTOR");
+                const dataUrl = await fetchAndMerge("Build.data.unityweb", 1, 102, "NIVELES (2GB)");
 
-                const config = {
+                // 2. Setup the Unity Config
+                const json = {
                     "companyName": "SpanishFreddy",
                     "productName": "Cuphead",
                     "dataUrl": dataUrl,
                     "wasmCodeUrl": wasmUrl,
-                    "wasmFrameworkUrl": "Build.wasm.framework.unityweb",
-                    "asmCodeUrl": "Build.asm.code.unityweb.part1",
-                    "asmMemoryUrl": "Build.asm.memory.unityweb",
-                    "asmFrameworkUrl": "Build.asm.framework.unityweb",
-                    "TOTAL_MEMORY": 536870912, // 512MB limit for Unity inside browser
+                    "wasmFrameworkUrl": "Build/Build.wasm.framework.unityweb",
+                    "asmCodeUrl": asmUrl,
+                    "asmMemoryUrl": "Build/Build.asm.memory.unityweb",
+                    "asmFrameworkUrl": "Build/Build.asm.framework.unityweb",
+                    "TOTAL_MEMORY": 536870912, 
                     "graphicsAPI": ["WebGL 2.0"],
+                    "webglContextAttributes": { "preserveDrawingBuffer": false },
+                    "backgroundColor": "#231F20"
                 };
 
-                UnityLoader.instantiate("unity-container", config, {
-                    onProgress: (gameInstance, progress) => {
-                        if (progress === 1) {
-                            loadingOverlay.style.display = "none";
-                        }
+                // 3. Start the game
+                const gameInstance = UnityLoader.instantiate("unityContainer", json, {
+                    onModuleCreated: () => {
+                        loadingText.textContent = "COMPILANDO JUEGO... (No cierres)";
                     }
                 });
+
+                // 4. Memory cleanup after game starts
+                // We wait 10 seconds to make sure Unity finished reading the Blobs
+                setTimeout(() => {
+                    loadingText.remove();
+                    URL.revokeObjectURL(dataUrl);
+                    URL.revokeObjectURL(wasmUrl);
+                    URL.revokeObjectURL(asmUrl);
+                }, 15000);
+
             } catch (err) {
-                loadingText.innerText = "ERROR DE MEMORIA - REINICIA CON CTRL+SHIFT+R";
-                console.error(err);
+                loadingText.innerHTML = "MEMORIA INSUFICIENTE<br>Presiona CTRL+SHIFT+R";
             }
-        }
+        })();
     </script>
 </body>
 </html>
