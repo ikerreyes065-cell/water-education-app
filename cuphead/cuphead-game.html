@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title>Cuphead</title>
+    <style>
+        html, body {
+            margin: 0; padding: 0; height: 100%; overflow: hidden;
+            background: #231F20; color: white; font-family: system-ui, sans-serif;
+        }
+        #unityContainer { position: fixed; inset: 0; width: 100%; height: 100%; }
+        #loading {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; z-index: 100;
+        }
+        #title { font-size: 48px; font-weight: bold; margin-bottom: 20px; }
+        #progressContainer { 
+            width: 480px; height: 22px; background:#222; border:2px solid #555; 
+            border-radius:9999px; overflow:hidden; margin:0 auto; 
+        }
+        #progressBar { 
+            height:100%; background:linear-gradient(90deg, #ffcc00, #ff6600); 
+            width:0%; transition:width 0.3s; 
+        }
+        #status { font-size:21px; margin:15px 0; }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div id="title">LOADING CUPHEAD...</div>
+        <div id="progressContainer"><div id="progressBar"></div></div>
+        <div id="status">Loading game files...</div>
+    </div>
+
+    <div id="unityContainer"></div>
+
+    <script src="Build/UnityLoader.js"></script>
+    <script>
+        const loading = document.getElementById('loading');
+        const progressBar = document.getElementById('progressBar');
+        const status = document.getElementById('status');
+
+        window.addEventListener('load', () => {
+            if (typeof UnityLoader === "undefined") {
+                status.textContent = "Error: Build folder not found. Upload the Build folder first.";
+                return;
+            }
+
+            status.textContent = "Starting Cuphead...";
+
+            const config = {
+                companyName: "SpanishFreddy",
+                productName: "Cuphead",
+                dataUrl: "Build/Build.data.unityweb",
+                wasmCodeUrl: "Build/Build.wasm.code.unityweb",
+                wasmFrameworkUrl: "Build/Build.wasm.framework.unityweb",
+                asmCodeUrl: "Build/Build.asm.code.unityweb",
+                asmMemoryUrl: "Build/Build.asm.memory.unityweb",
+                asmFrameworkUrl: "Build/Build.asm.framework.unityweb",
+                TOTAL_MEMORY: 384 * 1024 * 1024,   // Good for 8GB RAM
+                graphicsAPI: ["WebGL 2.0"],
+                backgroundColor: "#231F20"
+            };
+
+            UnityLoader.instantiate("unityContainer", config, {
+                onProgress: (progress) => {
+                    progressBar.style.width = (progress * 100) + "%";
+                    if (progress > 0.05) {
+                        status.textContent = `Loading... ${Math.round(progress * 100)}%`;
+                    }
+                },
+                Module: {
+                    onRuntimeInitialized: () => {
+                        loading.style.display = "none";
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
