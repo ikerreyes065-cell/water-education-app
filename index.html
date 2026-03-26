@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA BÓVEDA v1.5</title>
+    <title>LA BÓVEDA v1.5 - FULL EDITION</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -39,6 +39,50 @@
             transition: background 0.5s ease;
         }
 
+        /* --- BOTÓN TROLL Y OVERLAY --- */
+        .troll-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 99999;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            transition: all 0.1s;
+            user-select: none;
+        }
+
+        .troll-ghost {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 99998;
+            filter: blur(2px);
+            transition: 0.4s ease-out;
+        }
+
+        #hack-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 1000000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #0f0;
+            font-family: monospace;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* --- ESTILOS PRINCIPALES --- */
         #welcome-screen {
             text-align: center;
             transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -65,7 +109,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -3px;
-            filter: drop-shadow(0 10px 20px rgba(56, 189, 248, 0.3));
         }
 
         .enter-btn {
@@ -78,20 +121,14 @@
             border-radius: 20px;
             cursor: pointer;
             transition: 0.4s var(--bounce);
-            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
             margin-top: 30px;
-        }
-
-        .enter-btn:hover {
-            transform: scale(1.1) rotate(-3deg);
-            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.5);
         }
 
         #game-section {
             display: none; 
             opacity: 0;
-            width: 90%;
-            max-width: 1300px;
+            width: 95%;
+            max-width: 1400px;
             padding: 40px 20px;
             text-align: center;
         }
@@ -119,165 +156,92 @@
             transition: 0.3s var(--bounce);
         }
 
-        .cat-btn:hover, .cat-btn.active {
-            background: var(--primary);
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.4);
-        }
+        .cat-btn.active { background: var(--primary); }
 
         .game-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 25px; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 20px; 
         }
 
         .game-card { 
             background: var(--card-bg); 
-            border-radius: 24px; 
+            border-radius: 20px; 
             overflow: hidden; 
             position: relative; 
-            transition: 0.6s var(--bounce); 
+            transition: 0.5s var(--bounce); 
             border: 1px solid rgba(255,255,255,0.1);
             text-decoration: none; 
-            display: block; 
             opacity: 0;
-            transform: translateY(40px) scale(0.9);
+            transform: translateY(30px);
         }
 
-        .game-card:hover { 
-            transform: translateY(-15px) scale(1.05) rotate(2deg);
-            border-color: var(--primary);
-            z-index: 10;
-        }
+        .game-card:hover { transform: translateY(-10px) scale(1.05); border-color: var(--primary); }
 
-        .game-img { width: 100%; height: 180px; object-fit: cover; transition: 0.5s ease; }
-        .game-card:hover .game-img { transform: scale(1.15); }
+        .game-img { width: 100%; height: 160px; object-fit: cover; }
 
-        .game-info { padding: 20px; text-align: left; background: #0f172a; }
-        .game-title { font-weight: 900; font-size: 1.2rem; color: #fff; }
+        .game-info { padding: 15px; background: #0f172a; text-align: left; }
+        .game-title { font-weight: 800; font-size: 1.1rem; color: #fff; }
 
         .description-overlay {
             position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(168, 85, 247, 0.95));
-            color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            padding: 25px; opacity: 0;
-            transition: 0.4s var(--bounce);
-            font-weight: 800; text-align: center;
-            transform: scale(0.8) translateY(20px);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.9), rgba(168, 85, 247, 0.9));
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            padding: 20px; opacity: 0; transition: 0.3s; font-weight: 700;
         }
 
-        .game-card:hover .description-overlay { opacity: 1; transform: scale(1) translateY(0); }
+        .game-card:hover .description-overlay { opacity: 1; }
+
+        /* MODAL */
+        #warning-modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+            z-index: 10000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #1e293b; padding: 30px; border-radius: 25px;
+            border: 2px solid var(--accent); text-align: center; max-width: 400px;
+        }
 
         .show-content { display: block !important; opacity: 1 !important; }
 
-        @keyframes cardPop {
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* --- WARNING MODAL STYLES --- */
-        #warning-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(15px);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: #1e293b;
-            padding: 40px;
-            border-radius: 30px;
-            border: 2px solid var(--accent);
-            text-align: center;
-            max-width: 450px;
-            box-shadow: 0 0 50px rgba(244, 63, 94, 0.4);
-            animation: modalIn 0.5s var(--bounce);
-        }
-
-        @keyframes modalIn {
-            from { transform: scale(0.5) translateY(100px); opacity: 0; }
-            to { transform: scale(1) translateY(0); opacity: 1; }
-        }
-
-        .kb-shortcut {
-            background: #334155;
-            padding: 5px 12px;
-            border-radius: 8px;
-            border-bottom: 4px solid #000;
-            font-family: monospace;
-            color: var(--primary);
-        }
-
-        .modal-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 15px;
-            font-weight: 900;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
-
-        .modal-btn:hover { transform: scale(1.1); filter: brightness(1.2); }
-
-        /* EL BOTÓN TROLL */
-        .troll-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(45deg, #ffd700, #ff8c00);
-            color: #000;
-            padding: 15px 25px;
-            border-radius: 30px;
-            font-weight: 900;
-            font-size: 1.1rem;
-            cursor: pointer;
-            z-index: 9999;
-            border: 3px solid #fff;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            transition: 0.1s;
-        }
-
+        @keyframes cardPop { to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div id="cursor-glow"></div>
 
-    <div id="warning-modal">
-        <div class="modal-content">
-            <h2 style="color: var(--accent); font-size: 2rem;">⚠️ ¡ALERTA DE CRASH!</h2>
-            <p style="font-size: 1.1rem; line-height: 1.6;">
-                Celeste consume mucha RAM. Para evitar que tu Chromebook se reinicie, presiona:
-                <br><br>
-                <span class="kb-shortcut">CTRL</span> + <span class="kb-shortcut">SHIFT</span> + <span class="kb-shortcut">R</span>
-                <br><br>
-                ...cuando estés en la pantalla de carga del juego.
-            </p>
-            <button class="modal-btn" onclick="proceedToGame()">ENTENDIDO, VAMOS</button>
+    <div id="hack-overlay">
+        <h2 style="color: #0f0;">ACCESSING ENCRYPTED DATA...</h2>
+        <p id="hack-status">Iniciando transferencia...</p>
+        <div style="width: 250px; height: 10px; border: 1px solid #0f0; margin: 20px;">
+            <div id="hack-bar" style="width: 0%; height: 100%; background: #0f0;"></div>
         </div>
     </div>
 
-    <div class="troll-btn" onmouseover="trollMe(this)" onclick="gotcha()">🤑 FREE ROBUX</div>
+    <div id="warning-modal">
+        <div class="modal-content">
+            <h2 style="color: var(--accent);">⚠️ ¡RAM CRITICAL!</h2>
+            <p>Presiona <b style="color:var(--primary)">CTRL+SHIFT+R</b> en la carga para no crashear tu Chromebook.</p>
+            <button class="enter-btn" style="padding: 10px 20px; font-size: 1rem;" onclick="proceedToGame()">DALE</button>
+        </div>
+    </div>
+
+    <div id="troll-master" class="troll-btn" onmouseover="trollMe(this)" onclick="gotcha()">🤑 FREE ROBUX</div>
 
     <div id="welcome-screen">
         <h1>LA BÓVEDA</h1>
-        <p style="font-size: 1.2rem; color: #94a3b8; margin-top: 15px; font-weight: 700;">ACCESO PREMIUM V1.5 (100% real no fake)</p>
-        <button class="enter-btn" onclick="openVault()" onmouseover="this.innerText='¿SEGURO?'" onmouseout="this.innerText='INICIAR SISTEMA'">INICIAR SISTEMA</button>
+        <p style="font-weight: 700; color: #94a3b8;">SISTEMA PREMIUM v1.5</p>
+        <button class="enter-btn" onclick="openVault()">INICIAR SISTEMA</button>
     </div>
 
     <div id="game-section">
         <div class="category-bar">
             <button class="cat-btn active" onclick="filterGames('all', this)">TODOS</button>
-            <button class="cat-btn" onclick="filterGames('platformer', this)">SALTOS Y SUFRIMIENTO</button>
-            <button class="cat-btn" onclick="filterGames('action', this)">PELEAS</button>
-            <button class="cat-btn" onclick="filterGames('extra', this)">COSAS RANDOM</button>
+            <button class="cat-btn" onclick="filterGames('platformer', this)">PLATAFORMAS</button>
+            <button class="cat-btn" onclick="filterGames('action', this)">ACCIÓN</button>
+            <button class="cat-btn" onclick="filterGames('extra', this)">EXTRAS</button>
         </div>
         
         <div class="game-grid" id="main-grid">
@@ -379,7 +343,7 @@
 
             <a href="epstein.html" class="game-card" data-cat="action">
                 <img src="ep.png" class="game-img" />
-                <div class="game-info"><div class="game-title">Five night's at Epstein's</div></div>
+                <div class="game-info"><div class="game-title">Five nights at Epstein's</div></div>
                 <div class="description-overlay">Sin comentarios. 🌚</div>
             </a>
         </div>
@@ -392,43 +356,29 @@
             glow.style.top = e.clientY + 'px';
         });
 
-        // --- SISTEMA DE ADVERTENCIA PARA CELESTE ---
         let pendingUrl = "";
         function checkCeleste(e, url) {
-            e.preventDefault(); // Detiene el viaje inmediato a la página
+            e.preventDefault();
             pendingUrl = url;
             document.getElementById('warning-modal').style.display = 'flex';
             return false;
         }
 
-        function proceedToGame() {
-            window.location.href = pendingUrl;
-        }
+        function proceedToGame() { window.location.href = pendingUrl; }
 
         function openVault() {
-            const welcome = document.getElementById('welcome-screen');
-            welcome.style.transform = 'scale(0.5) rotate(-10deg)';
-            welcome.style.opacity = '0';
-
-            setTimeout(() => {
-                welcome.style.display = 'none';
-                const section = document.getElementById('game-section');
-                section.classList.add('show-content');
-                animateCards();
-                document.body.style.alignItems = 'flex-start';
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            }, 600);
+            document.getElementById('welcome-screen').style.display = 'none';
+            const section = document.getElementById('game-section');
+            section.classList.add('show-content');
+            document.body.style.alignItems = 'flex-start';
+            animateCards();
         }
 
         function animateCards() {
             const cards = document.querySelectorAll('.game-card');
-            let visibleIndex = 0;
-            cards.forEach((card) => {
+            cards.forEach((card, i) => {
                 if(card.style.display !== 'none') {
-                    card.style.animation = 'none';
-                    card.offsetHeight;
-                    card.style.animation = `cardPop 0.7s var(--bounce) ${visibleIndex * 0.08}s forwards`;
-                    visibleIndex++;
+                    card.style.animation = `cardPop 0.5s var(--bounce) ${i * 0.05}s forwards`;
                 }
             });
         }
@@ -436,35 +386,33 @@
         function filterGames(category, btn) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
-            const cards = document.querySelectorAll('.game-card');
-            cards.forEach(card => {
-                if (category === 'all' || card.getAttribute('data-cat') === category) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(40px) scale(0.9)';
-                }
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.style.display = (category === 'all' || card.dataset.cat === category) ? 'block' : 'none';
             });
             animateCards();
         }
 
+        /* TROLL LOGIC */
         function trollMe(btn) {
-            const audio = new Audio("https://www.myinstants.com/media/sounds/vine-boom.mp3");
-            audio.volume = 0.5;
-            audio.play().catch(e => {});
-
+            new Audio("https://www.myinstants.com/media/sounds/vine-boom.mp3").play().catch(()=>{});
+            const x = Math.random() * (window.innerWidth - 150);
+            const y = Math.random() * (window.innerHeight - 50);
             btn.style.position = 'fixed';
-            btn.style.top = Math.random() * 80 + 10 + "vh";
-            btn.style.left = Math.random() * 80 + 10 + "vw";
-            
-            const phrases = ["CASI", "MUY LENTO", "NICE TRY", "LMAO", "SIGUE INTENTANDO"];
-            btn.innerHTML = phrases[Math.floor(Math.random() * phrases.length)];
+            btn.style.left = x + 'px'; btn.style.top = y + 'px';
+            btn.innerHTML = ["CASI", "NOP", "MUY MANCO", "LMAO"][Math.floor(Math.random()*4)];
         }
 
         function gotcha() {
-            alert("¡Felicidades! Acabas de ganar 0 Robux. 📉");
+            document.getElementById('hack-overlay').style.display = 'flex';
+            let p = 0;
+            const bar = document.getElementById('hack-bar');
+            const st = document.getElementById('hack-status');
+            const iv = setInterval(() => {
+                p += 2;
+                bar.style.width = p + "%";
+                st.innerText = `Enviando historial a la policía... ${p}%`;
+                if(p >= 100) { clearInterval(iv); location.reload(); }
+            }, 50);
         }
     </script>
 </body>
