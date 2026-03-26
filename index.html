@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA BÓVEDA v1.5 - FULL EDITION</title>
+    <title>LA BÓVEDA v1.5 - CAOS EDITION</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -25,6 +25,7 @@
             justify-content: center;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: 0.1s;
         }
 
         #cursor-glow {
@@ -39,50 +40,58 @@
             transition: background 0.5s ease;
         }
 
-        /* --- BOTÓN TROLL Y OVERLAY --- */
-        .troll-btn {
+        /* --- BOTÓN TROLL EVOLUCIONADO A "BOTÓN DEL CAOS" --- */
+        .caos-btn {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: linear-gradient(45deg, #ffd700, #ff8c00);
-            color: #000;
-            padding: 15px 25px;
-            border-radius: 30px;
-            font-weight: 900;
-            font-size: 1.1rem;
-            cursor: pointer;
-            z-index: 99999;
-            border: 3px solid #fff;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            transition: all 0.1s;
-            user-select: none;
-        }
-
-        .troll-ghost {
-            position: fixed;
-            pointer-events: none;
-            opacity: 0.4;
-            z-index: 99998;
-            filter: blur(2px);
-            transition: 0.4s ease-out;
-        }
-
-        #hack-overlay {
-            position: fixed;
-            inset: 0;
             background: #000;
-            z-index: 1000000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             color: #0f0;
             font-family: monospace;
-            padding: 20px;
-            text-align: center;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 99999;
+            border: 3px solid #0f0;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+            transition: all 0.1s;
+            user-select: none;
+            text-transform: uppercase;
         }
 
-        /* --- ESTILOS PRINCIPALES --- */
+        .caos-btn:hover {
+            color: #000;
+            background: #0f0;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 1);
+            transform: scale(1.1);
+        }
+
+        /* --- ELEMENTOS DEL CAOS --- */
+        .fake-ad {
+            position: fixed;
+            border: 2px solid #fff;
+            background: #ff0;
+            color: #000;
+            padding: 10px;
+            font-weight: bold;
+            z-index: 100000;
+            pointer-events: none;
+            animation: ad-float 2s infinite linear;
+        }
+
+        .screen-invert {
+            filter: invert(100%);
+        }
+
+        @keyframes ad-float {
+            0% { transform: translate(0,0); }
+            50% { transform: translate(10px,10px); }
+            100% { transform: translate(0,0); }
+        }
+
+        /* --- ESTILOS PRINCIPALES (RESTAURADOS) --- */
         #welcome-screen {
             text-align: center;
             transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -212,14 +221,6 @@
 
     <div id="cursor-glow"></div>
 
-    <div id="hack-overlay">
-        <h2 style="color: #0f0;">ACCESSING ENCRYPTED DATA...</h2>
-        <p id="hack-status">Iniciando transferencia...</p>
-        <div style="width: 250px; height: 10px; border: 1px solid #0f0; margin: 20px;">
-            <div id="hack-bar" style="width: 0%; height: 100%; background: #0f0;"></div>
-        </div>
-    </div>
-
     <div id="warning-modal">
         <div class="modal-content">
             <h2 style="color: var(--accent);">⚠️ ¡RAM CRITICAL!</h2>
@@ -228,7 +229,7 @@
         </div>
     </div>
 
-    <div id="troll-master" class="troll-btn" onmouseover="trollMe(this)" onclick="gotcha()">🤑 FREE ROBUX</div>
+    <div id="caos-master" class="caos-btn" onclick="startCaos()">C:\> SYSTEM_PATCH.EXE</div>
 
     <div id="welcome-screen">
         <h1>LA BÓVEDA</h1>
@@ -392,27 +393,72 @@
             animateCards();
         }
 
-        /* TROLL LOGIC */
-        function trollMe(btn) {
-            new Audio("https://www.myinstants.com/media/sounds/vine-boom.mp3").play().catch(()=>{});
-            const x = Math.random() * (window.innerWidth - 150);
-            const y = Math.random() * (window.innerHeight - 50);
-            btn.style.position = 'fixed';
-            btn.style.left = x + 'px'; btn.style.top = y + 'px';
-            btn.innerHTML = ["CASI", "NOP", "MUY MANCO", "LMAO"][Math.floor(Math.random()*4)];
-        }
+        /* --- LÓGICA DEL MODO CAOS (PREPÁRATE Bro) --- */
+        function startCaos() {
+            const btn = document.getElementById('caos-master');
+            btn.innerHTML = "¡ERROR CRÍTICO!";
+            btn.style.borderColor = 'red';
+            btn.style.color = 'red';
+            btn.style.background = 'black';
+            btn.style.animation = 'float 0.1s infinite';
 
-        function gotcha() {
-            document.getElementById('hack-overlay').style.display = 'flex';
-            let p = 0;
-            const bar = document.getElementById('hack-bar');
-            const st = document.getElementById('hack-status');
-            const iv = setInterval(() => {
-                p += 2;
-                bar.style.width = p + "%";
-                st.innerText = `Enviando historial a la policía... ${p}%`;
-                if(p >= 100) { clearInterval(iv); location.reload(); }
+            // 1. INICIAR SONIDOS (¡Muchos sonidoss!)
+            const soundUrls = [
+                "https://www.myinstants.com/media/sounds/vine-boom.mp3", // Boom
+                "https://www.myinstants.com/media/sounds/error.mp3", // Windows Error
+                "https://www.myinstants.com/media/sounds/rick-roll.mp3", // Rickroll
+                "https://www.myinstants.com/media/sounds/sad-violin.mp3", // Sad Violin
+                "https://www.myinstants.com/media/sounds/taco-bell-bong.mp3", // Taco Bell
+                "https://www.myinstants.com/media/sounds/inceptionbutton.mp3" // Inception
+            ];
+
+            // Reproducir todos simultáneamente para máximo caos auditivo
+            soundUrls.forEach(url => {
+                const a = new Audio(url);
+                a.volume = 0.6;
+                a.play().catch(()=>{}); // Evitar bloqueos del navegador
+            });
+
+            // Sonido ambiente molesto de fondo
+            const b = new Audio("https://www.myinstants.com/media/sounds/discord-notification.mp3");
+            b.loop = true;
+            b.play().catch(()=>{});
+
+            // 2. INICIAR CAOS VISUAL
+            document.body.classList.add('screen-invert');
+            const shake = setInterval(() => {
+                document.body.style.transform = `translate(${Math.random()*10}px, ${Math.random()*10}px)`;
             }, 50);
+
+            // 3. CREAR ANUNCIOS FALSOS
+            const adTexts = [
+                "¡GANASTE UN IPHONE!",
+                "RAM DESCARGADA CORRUPTA",
+                "TU PC TIENE CÁNCER",
+                "RICKROLL DETECTADO",
+                "¡OBLÍGAME!",
+                "01010101010101"
+            ];
+
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const ad = document.createElement('div');
+                    ad.className = 'fake-ad';
+                    ad.style.top = Math.random()*window.innerHeight + 'px';
+                    ad.style.left = Math.random()*window.innerWidth + 'px';
+                    ad.style.background = `rgb(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255})`;
+                    ad.innerHTML = adTexts[Math.floor(Math.random()*adTexts.length)];
+                    document.body.appendChild(ad);
+                }, i * 200);
+            }
+
+            // 4. PARAR EL CAOS Y REINICIAR LA BÓVEDA
+            setTimeout(() => {
+                clearInterval(shake);
+                b.pause();
+                alert("¡Felicidades Bro, acabas de 'parchear' tu sistema! 😂. Volviendo a la normalidad...");
+                location.reload();
+            }, 7000); // 7 segundos de puro sufrimiento
         }
     </script>
 </body>
