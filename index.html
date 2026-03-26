@@ -54,7 +54,7 @@
 
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(1deg); } /* Un toque goofy sutil */
+            50% { transform: translateY(-20px) rotate(1deg); }
         }
 
         h1 {
@@ -145,7 +145,7 @@
         }
 
         .game-card:hover { 
-            transform: translateY(-15px) scale(1.05) rotate(2deg); /* Gira un poquito al pasar el mouse */
+            transform: translateY(-15px) scale(1.05) rotate(2deg);
             border-color: var(--primary);
             z-index: 10;
         }
@@ -175,7 +175,58 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* EL BOTÓN TROLL ELEGANTE PERO SUS */
+        /* --- WARNING MODAL STYLES --- */
+        #warning-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 30px;
+            border: 2px solid var(--accent);
+            text-align: center;
+            max-width: 450px;
+            box-shadow: 0 0 50px rgba(244, 63, 94, 0.4);
+            animation: modalIn 0.5s var(--bounce);
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.5) translateY(100px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .kb-shortcut {
+            background: #334155;
+            padding: 5px 12px;
+            border-radius: 8px;
+            border-bottom: 4px solid #000;
+            font-family: monospace;
+            color: var(--primary);
+        }
+
+        .modal-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .modal-btn:hover { transform: scale(1.1); filter: brightness(1.2); }
+
+        /* EL BOTÓN TROLL */
         .troll-btn {
             position: fixed;
             bottom: 30px;
@@ -190,11 +241,7 @@
             z-index: 9999;
             border: 3px solid #fff;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            transition: 0.1s; /* Rápido para que escape */
-        }
-        
-        .troll-btn:hover {
-            transform: scale(1.1);
+            transition: 0.1s;
         }
 
     </style>
@@ -202,6 +249,20 @@
 <body>
 
     <div id="cursor-glow"></div>
+
+    <div id="warning-modal">
+        <div class="modal-content">
+            <h2 style="color: var(--accent); font-size: 2rem;">⚠️ ¡ALERTA DE CRASH!</h2>
+            <p style="font-size: 1.1rem; line-height: 1.6;">
+                Celeste consume mucha RAM. Para evitar que tu Chromebook se reinicie, presiona:
+                <br><br>
+                <span class="kb-shortcut">CTRL</span> + <span class="kb-shortcut">SHIFT</span> + <span class="kb-shortcut">R</span>
+                <br><br>
+                ...cuando estés en la pantalla de carga del juego.
+            </p>
+            <button class="modal-btn" onclick="proceedToGame()">ENTENDIDO, VAMOS</button>
+        </div>
+    </div>
 
     <div class="troll-btn" onmouseover="trollMe(this)" onclick="gotcha()">🤑 FREE ROBUX</div>
 
@@ -220,7 +281,7 @@
         </div>
         
         <div class="game-grid" id="main-grid">
-            <a href="celeste-game.html" class="game-card" data-cat="platformer">
+            <a href="celeste-game.html" class="game-card" data-cat="platformer" onclick="return checkCeleste(event, this.href)">
                 <img src="celeste-thumb.jpeg" class="game-img" />
                 <div class="game-info"><div class="game-title">🏔️ Celeste Classic</div></div>
                 <div class="description-overlay">Te vas a caer mucho. 🍓</div>
@@ -331,8 +392,17 @@
             glow.style.top = e.clientY + 'px';
         });
 
-        function changeGlow(color) {
-            glow.style.background = `radial-gradient(circle, ${color} 0%, transparent 70%)`;
+        // --- SISTEMA DE ADVERTENCIA PARA CELESTE ---
+        let pendingUrl = "";
+        function checkCeleste(e, url) {
+            e.preventDefault(); // Detiene el viaje inmediato a la página
+            pendingUrl = url;
+            document.getElementById('warning-modal').style.display = 'flex';
+            return false;
+        }
+
+        function proceedToGame() {
+            window.location.href = pendingUrl;
         }
 
         function openVault() {
@@ -380,19 +450,15 @@
             animateCards();
         }
 
-        // --- SISTEMA DEL BOTÓN TROLL ---
         function trollMe(btn) {
-            // Sonido goofy sutil (Vine Boom)
             const audio = new Audio("https://www.myinstants.com/media/sounds/vine-boom.mp3");
-            audio.volume = 0.5; // No tan alto para no asustar
-            audio.play().catch(e => console.log("Audio bloqueado hasta hacer click")); // Previene errores de autoplay
+            audio.volume = 0.5;
+            audio.play().catch(e => {});
 
-            // Lo mueve lejos del cursor
             btn.style.position = 'fixed';
             btn.style.top = Math.random() * 80 + 10 + "vh";
             btn.style.left = Math.random() * 80 + 10 + "vw";
             
-            // Textos graciosos
             const phrases = ["CASI", "MUY LENTO", "NICE TRY", "LMAO", "SIGUE INTENTANDO"];
             btn.innerHTML = phrases[Math.floor(Math.random() * phrases.length)];
         }
