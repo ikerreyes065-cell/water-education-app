@@ -3,78 +3,125 @@
 <head>
     <base href="https://cdn.jsdelivr.net/gh/aukak/hollow-knight@2fc2e7149f0d5b2609b135ab48f00fd973930635/">
     <meta charset="utf-8">
-    <title>Hollow Knight | Performance Mode</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Hollow Knight | Performance Optimized</title>
     <style>
-        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
-        #unity-canvas { width: 100vw; height: 100vh; background: #000; }
-        #loading-text {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: #7289da; font-family: sans-serif; font-size: 20px; z-index: 20;
+        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+        #unity-canvas { width: 100%; height: 100%; background: #000; display: none; }
+        #loading-overlay {
+            position: fixed; inset: 0; background: #050505;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
         }
+        #loading-text { color: #7289da; font-size: 24px; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase; }
+        #progress-bar { width: 300px; height: 4px; background: #1a1a1a; border-radius: 2px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: #7289da; transition: width 0.3s; }
+        .kb-hint { color: #444; font-size: 12px; margin-top: 15px; }
     </style>
 </head>
+
 <body>
-    <div id="loading-text">PREPARING VOID... 0%</div>
+    <div id="loading-overlay">
+        <div id="loading-text">WAKING THE KNIGHT...</div>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        <div class="kb-hint">Tip: Close other tabs for better FPS</div>
+    </div>
+
     <canvas id="unity-canvas"></canvas>
 
     <script>
-        // --- MEMORY & CACHE HELPERS ---
-        async function fetchGameFile(url, label) {
-            const response = await fetch(url);
-            const reader = response.body.getReader();
-            const contentLength = +response.headers.get('Content-Length');
-            let receivedLength = 0;
+        const loadingText = document.getElementById('loading-text');
+        const progressFill = document.getElementById('progress-fill');
+        const canvas = document.getElementById('unity-canvas');
+
+        // --- PERFORMANCE MERGE LOGIC ---
+        // This fetches all 45 parts and joins them into one 1GB file in RAM
+        async function fetchAndMerge(fileName, start, end, label) {
             let chunks = [];
-            while(true) {
-                const {done, value} = await reader.read();
-                if (done) break;
-                chunks.push(value);
-                receivedLength += value.length;
-                document.getElementById('loading-text').innerText = `${label}: ${Math.round((receivedLength/contentLength)*100)}%`;
+            let totalBytes = 0;
+            
+            for (let i = start; i <= end; i++) {
+                const url = `Build/${fileName}.part${i}`;
+                const response = await fetch(url, { mode: 'cors' });
+                if (!response.ok) throw new Error(`Failed part ${i}`);
+                
+                const buffer = await response.arrayBuffer();
+                chunks.push(buffer);
+                totalBytes += buffer.byteLength;
+                
+                // Update Progress
+                const overallProgress = (i / end) * 100;
+                loadingText.innerText = `${label}: ${Math.round(overallProgress)}%`;
+                progressFill.style.width = `${overallProgress}%`;
             }
-            return URL.createObjectURL(new Blob(chunks));
+
+            const blob = new Blob(chunks, { type: 'application/octet-stream' });
+            chunks = null; // Memory Cleanup
+            return URL.createObjectURL(blob);
         }
 
         (async () => {
-            const canvas = document.querySelector("#unity-canvas");
-            
-            // 1. Fetch main files (Manually merging the 45 parts of data)
-            // Note: For HK, we fetch the loader first
-            const loaderUrl = "Build/hktruffled.loader.js";
-            
-            const script = document.createElement("script");
-            script.src = loaderUrl;
-            script.onload = async () => {
-                const dataUrl = await fetchGameFile("Build/hktruffled.data.part1", "LOADING DATA");
-                const wasmUrl = await fetchGameFile("Build/hktruffled.wasm.part1", "LOADING WASM");
+            try {
+                // 1. Load the Loader Script first
+                const loaderScript = document.createElement("script");
+                loaderScript.src = "Build/hktruffled.loader.js";
+                document.body.appendChild(loaderScript);
 
-                const config = {
-                    dataUrl: dataUrl,
-                    frameworkUrl: "Build/hktruffled.framework.js",
-                    codeUrl: wasmUrl,
-                    streamingAssetsUrl: "StreamingAssets",
-                    companyName: "Team Cherry",
-                    productName: "Hollow Knight",
-                    productVersion: "1.1",
-                    // LAG FIXES START HERE:
-                    devicePixelRatio: 1, // Forces 1:1 pixel mapping (HUGE FPS BOOST)
-                    powerPreference: "high-performance",
-                    webglContextAttributes: {
-                        preserveDrawingBuffer: false,
-                        powerPreference: "high-performance",
-                        antialias: false, // Disabling antialiasing saves GPU power
-                        depth: true
-                    }
+                loaderScript.onload = async () => {
+                    // 2. Fetch all parts of the game data (45 parts)
+                    const dataUrl = await fetchAndMerge("hktruffled.data", 1, 45, "COLLECTING SOUL");
+                    
+                    // 3. Fetch WASM code (2 parts)
+                    const wasmUrl = await fetchAndMerge("hktruffled.wasm", 1, 2, "PREPARING VOID");
+
+                    const config = {
+                        dataUrl: dataUrl,
+                        frameworkUrl: "Build/hktruffled.framework.js",
+                        codeUrl: wasmUrl,
+                        streamingAssetsUrl: "StreamingAssets",
+                        companyName: "Team Cherry",
+                        productName: "Hollow Knight",
+                        productVersion: "1.1",
+                        
+                        // --- LAG REDUCTION SETTINGS ---
+                        devicePixelRatio: 1, // Forces lower resolution for massive FPS gain
+                        matchWebGLToCanvasSize: true,
+                        autoHideCursor: true,
+                        
+                        webglContextAttributes: {
+                            alpha: false, // Saves Video RAM
+                            antialias: false, // Saves GPU power
+                            depth: true,
+                            preserveDrawingBuffer: false,
+                            powerPreference: "high-performance"
+                        }
+                    };
+
+                    // 4. Start Unity
+                    createUnityInstance(canvas, config, (progress) => {
+                        loadingText.innerText = "ENTERING HALLOWNEST: " + Math.round(progress * 100) + "%";
+                        progressFill.style.width = (progress * 100) + "%";
+                    }).then((instance) => {
+                        // Success! Hide loading and show game
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        canvas.style.display = "block";
+                        
+                        // Clean up 1GB of temporary memory after 10 seconds
+                        setTimeout(() => {
+                            URL.revokeObjectURL(dataUrl);
+                            URL.revokeObjectURL(wasmUrl);
+                        }, 10000);
+                    }).catch((err) => {
+                        console.error(err);
+                        loadingText.innerText = "OUT OF MEMORY - REFRESH";
+                    });
                 };
-
-                createUnityInstance(canvas, config, (progress) => {
-                    document.getElementById('loading-text').innerText = "WAKING THE KNIGHT: " + Math.round(progress * 100) + "%";
-                }).then((instance) => {
-                    document.getElementById('loading-text').remove();
-                });
-            };
-            document.body.appendChild(script);
+            } catch (err) {
+                loadingText.innerText = "CONNECTION ERROR";
+                console.error(err);
+            }
         })();
-    </script>
-</body>
-</html>
+
+        // Handle window resizing
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight
