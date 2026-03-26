@@ -572,7 +572,7 @@
         /* ========== MUSIC WIDGET ========== */
         .music-widget {
             position: fixed;
-            bottom: 60px;
+            bottom: 65px;
             left: 20px;
             background: rgba(30,30,30,0.92);
             backdrop-filter: blur(30px);
@@ -584,12 +584,16 @@
             align-items: center;
             gap: 12px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-            min-width: 250px;
-            animation: slideUp 0.6s var(--smooth) 0.5s both;
+            width: 280px;
+            animation: musicSlideUp 0.6s var(--smooth) 0.5s both;
             transition: all 0.3s var(--smooth);
         }
         .music-widget:hover { border-color: var(--accent); }
-        .music-bars { display: flex; gap: 2px; align-items: flex-end; height: 20px; }
+        @keyframes musicSlideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .music-bars { display: flex; gap: 2px; align-items: flex-end; height: 20px; flex-shrink: 0; }
         .music-bar {
             width: 3px;
             background: var(--accent-light);
@@ -606,10 +610,10 @@
             0%, 100% { height: var(--h, 8px); }
             50% { height: calc(var(--h, 8px) + 6px); }
         }
-        .music-info { flex: 1; }
-        .music-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
-        .music-artist { font-size: 0.7rem; color: var(--text-tertiary); }
-        .music-controls { display: flex; gap: 4px; }
+        .music-info { flex: 1; min-width: 0; }
+        .music-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .music-artist { font-size: 0.7rem; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .music-controls { display: flex; gap: 4px; flex-shrink: 0; }
         .music-ctrl-btn {
             width: 32px; height: 32px;
             border-radius: 6px;
@@ -622,6 +626,7 @@
             justify-content: center;
             transition: all 0.2s;
             font-size: 18px;
+            flex-shrink: 0;
         }
         .music-ctrl-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
         /* ========== RESPONSIVE ========== */
@@ -895,7 +900,7 @@
         function createMusic() {
             ensureAudio();
             musicGain = audioCtx.createGain();
-            musicGain.gain.value = 0.04;
+            musicGain.gain.value = 0.35;
             musicGain.connect(audioCtx.destination);
             musicLoop();
         }
@@ -914,7 +919,7 @@
                 const g = audioCtx.createGain();
                 o.type = 'sine'; o.frequency.value = freq;
                 g.gain.setValueAtTime(0, now);
-                g.gain.linearRampToValueAtTime(0.015, now + 0.5);
+                g.gain.linearRampToValueAtTime(0.12, now + 0.5);
                 g.gain.linearRampToValueAtTime(0, now + 3);
                 o.connect(g); g.connect(musicGain);
                 o.start(now); o.stop(now + 3.5);
@@ -925,7 +930,7 @@
             const mg = audioCtx.createGain();
             mo.type = 'triangle'; mo.frequency.value = mel;
             mg.gain.setValueAtTime(0, now + 0.5);
-            mg.gain.linearRampToValueAtTime(0.008, now + 1);
+            mg.gain.linearRampToValueAtTime(0.07, now + 1);
             mg.gain.linearRampToValueAtTime(0, now + 2.5);
             mo.connect(mg); mg.connect(musicGain);
             mo.start(now + 0.5); mo.stop(now + 3);
@@ -962,7 +967,7 @@
         }
         function changeVolume(val) {
             document.getElementById('vol-label').textContent = val + '%';
-            if (musicGain) musicGain.gain.value = (val / 100) * 0.08;
+            if (musicGain) musicGain.gain.value = (val / 100) * 0.7;
             const icon = document.getElementById('vol-icon');
             icon.textContent = val == 0 ? 'volume_off' : val < 50 ? 'volume_down' : 'volume_up';
         }
@@ -1139,7 +1144,7 @@
                             document.getElementById('play-icon').textContent = 'pause';
                             document.getElementById('music-title').textContent = tracks[currentTrackIndex].name;
                             document.getElementById('music-artist').textContent = tracks[currentTrackIndex].artist;
-                            if (musicGain) musicGain.gain.value = 0.04;
+                            if (musicGain) musicGain.gain.value = 0.35;
                             musicLoop();
                             playRestoreSound();
                             showToast('Sistema Restaurado', 'Todo vuelve a la normalidad... te lo advertimos bro 😂', 'success', 5000);
