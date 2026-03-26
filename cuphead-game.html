@@ -36,30 +36,6 @@
       text-align: center;
       margin-top: 20px;
     }
-
-    #sidebarad1, #sidebarad2 {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 160px;
-      height: 600px;
-      z-index: 999999;
-    }
-
-    #sidebarad1 { left: 0; }
-    #sidebarad2 { right: 0; }
-
-    .sidebar-close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 22px;
-      height: 22px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      text-align: center;
-      cursor: pointer;
-    }
   </style>
 </head>
 
@@ -67,6 +43,59 @@
 
 <div id="loading-text">LOADING...</div>
 <div id="unityContainer"></div>
+
+<script>
+/* 🔥 REAL ERROR LOGGING */
+window.onerror = function(msg, url, line, col, error) {
+  console.log("ERROR:", msg, url, line, col, error);
+};
+
+/* 🔥 STREAM PART FILES (NO MEMORY EXPLOSION) */
+async function streamParts(baseName, count) {
+  let current = 1;
+
+  const stream = new ReadableStream({
+    async pull(controller) {
+      if (current > count) {
+        controller.close();
+        return;
+      }
+
+      const url = `${baseName}.part${current}`;
+      console.log("Loading:", url);
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Missing part: " + url);
+      }
+
+      const reader = res.body.getReader();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        controller.enqueue(value);
+      }
+
+      current++;
+    }
+  });
+
+  return new Response(stream);
+}
+
+/* 🔥 PATCH FETCH (Unity will think file exists normally) */
+const originalFetch = window.fetch;
+window.fetch = async function(resource, options) {
+
+  if (typeof resource === "string" && resource.includes("Build.data.unityweb")) {
+    console.log("Intercepting data file...");
+    return streamParts("Build/Build.data.unityweb", 102); // 👈 CHANGE PART COUNT IF NEEDED
+  }
+
+  return originalFetch(resource, options);
+};
+</script>
 
 <script src="Build/UnityLoader.js"></script>
 
@@ -81,16 +110,15 @@
 
   var gameInstance = UnityLoader.instantiate("unityContainer", {
     dataUrl: "Build/Build.data.unityweb",
+
+    /* ✅ ONLY WASM (FIXED) */
     wasmCodeUrl: "Build/Build.wasm.code.unityweb",
     wasmFrameworkUrl: "Build/Build.wasm.framework.unityweb",
-    asmCodeUrl: "Build/Build.asm.code.unityweb",
-    asmMemoryUrl: "Build/Build.asm.memory.unityweb",
-    asmFrameworkUrl: "Build/Build.asm.framework.unityweb",
 
     companyName: "SpanishFreddy",
     productName: "Cuphead",
 
-    TOTAL_MEMORY: 536870912, // 512MB
+    TOTAL_MEMORY: 536870912,
 
     backgroundColor: "#231F20"
   }, {
@@ -102,15 +130,6 @@
     }
   });
 </script>
-
-<!-- ADS (kept but safe) -->
-<div id="sidebarad1">
-  <div class="sidebar-close" onclick="this.parentElement.style.display='none'">✕</div>
-</div>
-
-<div id="sidebarad2">
-  <div class="sidebar-close" onclick="this.parentElement.style.display='none'">✕</div>
-</div>
 
 </body>
 </html>
