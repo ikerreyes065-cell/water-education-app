@@ -1,12 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Iron Snout</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iron Snout</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: black;
+    height: 100%;
+    width: 100%;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+</style>
 </head>
+
 <body>
 
 <canvas id="canvas"></canvas>
 
+<!-- ✅ Poki stub (prevents crashes) -->
 <script>
 window.PokiSDK = {
     init: () => Promise.resolve(),
@@ -17,13 +38,12 @@ window.PokiSDK = {
     commercialBreak: () => Promise.resolve(),
     rewardedBreak: () => Promise.resolve(false)
 };
-
-window.pokiSdkDebug = {
-    coreScriptUrl: "html5game/poki-sdk-core-v2.263.0.js"
-};
 </script>
 
+<!-- ✅ Load SDK (make sure path is correct or edited internally) -->
 <script src="html5game/poki-sdk.js"></script>
+
+<!-- ✅ Load game -->
 <script src="html5game/IronSnout.js"></script>
 
 </body>
