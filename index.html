@@ -2145,6 +2145,34 @@
             }, 3500);
             animateLoadingText();
         });
+        // --- IRON SNOUT LOADER ---
+function launchGame(url) {
+    const gameView = document.getElementById('game-view');
+    const gameFrame = document.getElementById('game-frame');
+    
+    if (gameView && gameFrame) {
+        gameFrame.src = url; 
+        gameView.style.display = 'block';
+        // Optional: Hide the main scrollbar so the page doesn't move behind the game
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeGame() {
+    const gameView = document.getElementById('game-view');
+    const gameFrame = document.getElementById('game-frame');
+    
+    if (gameView && gameFrame) {
+        gameView.style.display = 'none';
+        gameFrame.src = ''; 
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// ========== INIT ==========
+        window.addEventListener('load', () => {
+            initWelcomeCanvas();
+            // ... (the rest of your existing init code)
     </script>
 </body>
 </html>
