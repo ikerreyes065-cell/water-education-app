@@ -1,43 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <base href="https://ironsnoutonline.github.io/file/">
     <meta charset="UTF-8">
-    <title>Iron Snout</title>
+    <title>Iron Snout - Fixed Loader</title>
     <style>
-        body { 
-            background: #000; 
-            margin: 0; 
-            overflow: hidden; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-        }
-        canvas { 
-            image-rendering: pixelated; 
-            width: 100%; 
-            height: auto; 
-            max-width: 1536px; 
-            /* Added a border so you can see if the canvas is actually loading */
-            border: 1px solid #333; 
-        }
+        body { background: #000; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { image-rendering: pixelated; width: 100%; height: auto; max-width: 1536px; }
+        #gm4html5_div_id { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
     <div id="gm4html5_div_id">
-        <canvas id="canvas" width="1536" height="730">
-            Your browser doesn't support HTML5 canvas.
-        </canvas>
+        <canvas id="canvas" width="1536" height="730"></canvas>
     </div>
 
-    <script type="text/javascript" src="html5game/IronSnout.js"></script>
+    <script>
+        // FIX 1: Mock the Poki SDK to stop the "sdk is not defined" error
+        window.sdk = {
+            isAdBlocked: () => Promise.resolve(false),
+            gameLoadingStart: () => {},
+            gameLoadingFinished: () => {},
+            gameplayStart: () => {},
+            gameplayStop: () => {},
+            happyTime: () => {},
+            commercialBreak: () => Promise.resolve()
+        };
+        window.PokiSDK = window.sdk;
+    </script>
+
+    <script type="text/javascript" src="https://ironsnoutonline.github.io/file/html5game/IronSnout.js"></script>
 
     <script>
-        // GameMaker games sometimes need a kickstart to recognize the canvas
+        // FIX 3: Force start the game logic
         window.onload = function() {
-            if (window.GameMaker_Init) {
+            if (typeof GameMaker_Init === "function") {
                 GameMaker_Init();
+            } else {
+                console.error("GameMaker_Init not found. The JS file might still be blocked.");
             }
         };
     </script>
