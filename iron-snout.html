@@ -7,6 +7,20 @@
 
 <canvas id="canvas"></canvas>
 
+<!-- ✅ ADD THIS FIRST -->
+<script>
+window.PokiSDK = {
+    init: () => Promise.resolve(),
+    gameLoadingStart: () => {},
+    gameLoadingFinished: () => {},
+    gameplayStart: () => {},
+    gameplayStop: () => {},
+    commercialBreak: () => Promise.resolve(),
+    rewardedBreak: () => Promise.resolve(false)
+};
+</script>
+
+<!-- THEN LOAD THESE -->
 <script src="html5game/poki-sdk-core-v2.263.0.js"></script>
 <script src="html5game/poki-sdk.js"></script>
 <script src="html5game/IronSnout.js"></script>
