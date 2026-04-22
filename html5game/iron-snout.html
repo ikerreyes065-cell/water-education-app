@@ -7,15 +7,13 @@
 
 <style>
 body {
-    margin: 0;
-    overflow: hidden;
-    background: #000;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
 }
 
 canvas {
-    display: block;
-    width: 100vw;
-    height: 100vh;
+  display: block;
 }
 </style>
 </head>
@@ -24,9 +22,7 @@ canvas {
 
 <canvas id="canvas"></canvas>
 
-<!-- ✅ REMOVE cloak.js (it was 404) -->
-
-<!-- ✅ Fake Poki (prevents crashes from game code) -->
+<!-- Fake Poki SDK (prevents crashes) -->
 <script>
 window.PokiSDK = {
     init: () => Promise.resolve(),
@@ -41,26 +37,31 @@ window.PokiSDK = {
 };
 </script>
 
-<!-- ✅ GAME FILE -->
+<!-- Game scripts -->
+<script src="html5game/hqh_gmCallback.js"></script>
+<script src="html5game/jqh_ImageLoadBar.js"></script>
+<script src="html5game/kqh_SnoutWeb.js"></script>
+<script src="html5game/iqh_poki.js"></script>
+<script src="html5game/oqh_GameAnalytics.js"></script>
+<script src="html5game/pqh_GameAnalyticsExt.js"></script>
+
+<!-- Main game -->
 <script src="html5game/IronSnout.js"></script>
 
 <script>
 const canvas = document.getElementById("canvas");
 
 function poki_loading(p) {
-    if (window.PokiSDK && window.PokiSDK.gameLoadingProgress) {
-        window.PokiSDK.gameLoadingProgress({ percentageDone: p });
+    if (window.PokiSDK) {
+        PokiSDK.gameLoadingProgress({ percentageDone: p });
     }
 }
 
 window.onload = function () {
-
-    // start game
     if (typeof GameMaker_Init === "function") {
         GameMaker_Init();
     }
 
-    // resize canvas
     function resize() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -69,12 +70,12 @@ window.onload = function () {
     resize();
     window.addEventListener("resize", resize);
 
-    // fix audio (required)
+    // Fix audio unlock
     document.addEventListener("click", () => {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             ctx.resume();
-        } catch (e) {}
+        } catch(e){}
     });
 };
 </script>
