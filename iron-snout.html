@@ -7,7 +7,6 @@
 
 <canvas id="canvas"></canvas>
 
-<!-- ✅ ADD THIS FIRST -->
 <script>
 window.PokiSDK = {
     init: () => Promise.resolve(),
@@ -18,10 +17,12 @@ window.PokiSDK = {
     commercialBreak: () => Promise.resolve(),
     rewardedBreak: () => Promise.resolve(false)
 };
+
+window.pokiSdkDebug = {
+    coreScriptUrl: "html5game/poki-sdk-core-v2.263.0.js"
+};
 </script>
 
-<!-- THEN LOAD THESE -->
-<script src="html5game/poki-sdk-core-v2.263.0.js"></script>
 <script src="html5game/poki-sdk.js"></script>
 <script src="html5game/IronSnout.js"></script>
 
