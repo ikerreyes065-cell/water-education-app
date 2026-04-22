@@ -1,17 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="https://ironsnoutonline.github.io/file/">
     <meta charset="UTF-8">
     <title>Iron Snout</title>
     <style>
-        body { background: #000; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        canvas { image-rendering: pixelated; width: 100%; height: auto; max-width: 1536px; }
+        body { 
+            background: #000; 
+            margin: 0; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+        }
+        canvas { 
+            image-rendering: pixelated; 
+            width: 100%; 
+            height: auto; 
+            max-width: 1536px; 
+            /* Added a border so you can see if the canvas is actually loading */
+            border: 1px solid #333; 
+        }
     </style>
 </head>
 <body>
     <div id="gm4html5_div_id">
-        <canvas id="canvas" width="1536" height="730"></canvas>
+        <canvas id="canvas" width="1536" height="730">
+            Your browser doesn't support HTML5 canvas.
+        </canvas>
     </div>
+
     <script type="text/javascript" src="html5game/IronSnout.js"></script>
+
+    <script>
+        // GameMaker games sometimes need a kickstart to recognize the canvas
+        window.onload = function() {
+            if (window.GameMaker_Init) {
+                GameMaker_Init();
+            }
+        };
+    </script>
 </body>
 </html>
