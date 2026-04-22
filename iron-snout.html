@@ -24,7 +24,7 @@ canvas {
 
 <canvas id="canvas"></canvas>
 
-<!-- ✅ Poki stub (prevents crashes if SDK fails) -->
+<!-- ✅ SAFE Poki stub (no external SDK) -->
 <script>
 window.PokiSDK = {
     init: () => Promise.resolve(),
@@ -37,11 +37,28 @@ window.PokiSDK = {
     commercialBreak: () => Promise.resolve(),
     rewardedBreak: () => Promise.resolve(false)
 };
+
+// ✅ REQUIRED globals (prevents crashes)
+window.poki_loading = function (percent) {
+    if (window.PokiSDK && window.PokiSDK.gameLoadingProgress) {
+        window.PokiSDK.gameLoadingProgress({ percentageDone: percent });
+    }
+};
+
+window.poki_loading_finished = function () {
+    if (window.PokiSDK && window.PokiSDK.gameLoadingFinished) {
+        window.PokiSDK.gameLoadingFinished();
+    }
+};
+
+window.poki_log = function () {
+    // no-op (prevents errors)
+};
 </script>
 
-<!-- ✅ Load ALL required GameMaker + support scripts -->
-<script src="html5game/poki-sdk.js"></script>
+<!-- ❌ REMOVED poki-sdk.js (causes errors locally) -->
 
+<!-- ✅ GameMaker support scripts -->
 <script src="html5game/hqh_gmCallback.js"></script>
 <script src="html5game/jqh_ImageLoadBar.js"></script>
 <script src="html5game/kqh_SnoutWeb.js"></script>
@@ -49,32 +66,42 @@ window.PokiSDK = {
 <script src="html5game/oqh_GameAnalytics.js"></script>
 <script src="html5game/pqh_GameAnalyticsExt.js"></script>
 
-<!-- ✅ Main game file LAST -->
+<!-- ✅ Main game -->
 <script src="html5game/IronSnout.js"></script>
 
 <script>
-var sdk = window.PokiSDK;
-var canvas = document.getElementById("canvas");
+const canvas = document.getElementById("canvas");
 
-window.onload = function () {
-    sdk.init().then(() => {
-        if (typeof GameMaker_Init === "function") {
-            GameMaker_Init();
-        }
-        sdk.gameLoadingStart();
-    }).catch(() => {
-        if (typeof GameMaker_Init === "function") {
-            GameMaker_Init();
-        }
-    });
-
-    // Resize canvas to full screen
+function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+}
 
-    window.addEventListener("resize", function() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+window.onload = function () {
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    // ✅ Start GameMaker safely
+    if (typeof GameMaker_Init === "function") {
+        try {
+            GameMaker_Init();
+        } catch (e) {
+            console.error("GameMaker_Init failed:", e);
+        }
+    } else {
+        console.error("GameMaker_Init not found");
+    }
+
+    // ✅ Proper audio unlock (uses existing context)
+    document.addEventListener("click", function unlockAudio() {
+        try {
+            if (window.g_WebAudioContext && g_WebAudioContext.state !== "running") {
+                g_WebAudioContext.resume();
+            }
+        } catch (e) {}
+
+        document.removeEventListener("click", unlockAudio);
     });
 };
 </script>
