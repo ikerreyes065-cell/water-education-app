@@ -523,7 +523,6 @@
             opacity: 0;
             transform: translateY(40px) scale(0.95);
             position: relative;
-            cursor: pointer;
         }
         .game-card.visible {
             opacity: 1;
@@ -1048,6 +1047,7 @@
     <div class="ambient-blob blob-3"></div>
     <div class="ambient-blob blob-4"></div>
     <canvas id="bg-canvas"></canvas>
+    <!-- WELCOME SCREEN -->
     <div id="welcome-screen">
         <canvas id="welcome-canvas"></canvas>
         <div class="welcome-content">
@@ -1078,6 +1078,7 @@
             <button class="welcome-enter" id="welcome-enter-btn"><span>ENTER THE VAULT</span></button>
         </div>
     </div>
+    <!-- SPLASH (second screen) -->
     <div id="splash-screen">
         <canvas id="splash-canvas"></canvas>
         <div class="splash-content">
@@ -1087,6 +1088,7 @@
             <button class="splash-enter" id="splash-enter-btn">INICIAR</button>
         </div>
     </div>
+    <!-- BSOD (Troll) -->
     <div id="bsod">
         <div class="bsod-bg"></div>
         <div class="bsod-glitch"></div>
@@ -1106,6 +1108,7 @@
             <div class="bsod-qr">QR CODE:<br>trolled.lol</div>
         </div>
     </div>
+    <!-- WARNING MODAL -->
     <div id="warning-modal">
         <div class="win-dialog">
             <span class="material-icons-round" style="font-size:52px; color: var(--yellow); margin-bottom: 20px;">warning</span>
@@ -1114,10 +1117,13 @@
             <button class="dialog-btn" onclick="proceedToGame()">CONTINUE</button>
         </div>
     </div>
+    <!-- KONAMI -->
     <div class="konami-overlay" id="konami-overlay">
         <div class="konami-text">YOU FOUND THE<br>SECRET MODE</div>
     </div>
+    <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
+    <!-- MAIN APP -->
     <div id="app">
         <header class="app-header">
             <div class="header-top">
@@ -1142,10 +1148,11 @@
         </header>
         <main class="content-area">
             <div class="section-label">
-                LIBRARY <span class="count" id="game-count">0 GAMES</span>
+                LIBRARY <span class="count" id="game-count">16 GAMES</span>
             </div>
             <div class="game-grid" id="game-grid"></div>
         </main>
+        <!-- Troll Button -->
         <div class="troll-btn-wrap" id="troll-wrap">
             <button class="troll-btn" id="troll-btn" onclick="startTroll()">
                 <div class="troll-icon">
@@ -1158,6 +1165,7 @@
                 <span class="notif-dot"></span>
             </button>
         </div>
+        <!-- Music Widget -->
         <div class="music-widget" id="music-widget">
             <div class="music-visualizer" id="music-bars">
                 <div class="music-bar" style="--h:6px"></div>
@@ -1179,6 +1187,7 @@
                 <button class="music-ctrl-btn" onclick="nextTrack()"><span class="material-icons-round">skip_next</span></button>
             </div>
         </div>
+        <!-- Taskbar -->
         <div class="taskbar">
             <button class="taskbar-btn active" title="Home" onclick="playClickSound()"><span class="material-icons-round">home</span></button>
             <button class="taskbar-btn" title="Explorer" onclick="playClickSound()"><span class="material-icons-round">folder</span></button>
@@ -1195,6 +1204,7 @@
             <div class="taskbar-time" id="taskbar-time">21:42<br><span style="font-size:0.6rem">26/03/2026</span></div>
         </div>
     </div>
+    <!-- Cursor Trail Elements -->
     <div class="cursor-trail" id="trail-1"></div>
     <div class="cursor-trail" id="trail-2"></div>
     <div class="cursor-trail" id="trail-3"></div>
@@ -1203,14 +1213,13 @@
     <script>
         // ========== GAME DATA ==========
         const games = [
-            { title: "Celeste Classic", emoji: "🏔️", img: "celeste-thumb.jpeg", cat: "platformer", desc: "You're gonna fall a lot. 🍓", href: "celeste-game.html", loadWarning: true },
+            { title: "Celeste Classic", emoji: "🏔️", img: "celeste-thumb.jpeg", cat: "platformer", desc: "You're gonna fall a lot. 🍓", href: "celeste-game.html", celeste: true },
             { title: "Super Meat Boy", emoji: "🥩", img: "meat.jpeg", cat: "platformer", desc: "Basically a blender. ⚙️", href: "Meatboy.html" },
             { title: "Pizza tower", emoji: "🍕", img: "267.png", cat: "platformer", desc: "Destroy the pizza guy", href: "pizza.html" },
             { title: "Hollow knight silksong", emoji: "🛡️", img: "771.png", cat: "platformer", desc: "Destroy the infection", href: "silksong.html" },
             { title: "Undertale", emoji: "💀", img: "under.png", cat: "action", desc: "You will be judged for your sins. ❤️", href: "UNDERTALE.html" },
             { title: "Adventure drivers", emoji: "🚙", img: "443.png", cat: "action", desc: "A crazy driving game", href: "drivers.html" },
             { title: "The Binding of Isaac", emoji: "💧", img: "350.png", cat: "action", desc: "Crying solves everything. 😭", href: "isaac.html" },
-            { title: "Iron Snout", emoji: "🐷", img: "iron-snout.png", cat: "action", desc: "Fight off the wolf pack!", href: "iron-snout.html", loadWarning: true },
             { title: "Buckshot Roulette", emoji: "🔫", img: "buckshot.jpeg", cat: "action", desc: "All in on red. 💀", href: "buckshot-roulette-game.html" },
             { title: "Hollow Knight", emoji: "⚔️", img: "hollow.jpg", cat: "action", desc: "Insects with swords. 🐜", href: "hollow-knight.html" },
             { title: "Baldi's basics", emoji: "📏 ", img: "466.png", cat: "action", desc: "Get all the books", href: "bladi.html" },
@@ -1224,11 +1233,9 @@
             { title: "Minecraft 1.12.2", emoji: "⛏", img: "182.png", cat: "extra", desc: "Never gets old. 🧱", href: "minecraft.html" },
             { title: "Five nights at Epstein's", emoji: "👻", img: "ep.png", cat: "action", desc: "No comment. 🌚", href: "epstein.html" }
         ];
-
         const catLabels = { platformer: "PLATFORMER", action: "ACTION", extra: "EXTRAS" };
         let currentFilter = 'all';
         let partyMode = false;
-
         // ========== WELCOME CANVAS (Particles) ==========
         function initWelcomeCanvas() {
             const canvas = document.getElementById('welcome-canvas');
@@ -1825,14 +1832,10 @@
                 card.href = game.href;
                 card.className = 'game-card';
                 card.dataset.cat = game.cat;
-                
-                if (game.loadWarning) {
-                    card.onclick = (e) => { e.preventDefault(); checkCeleste(game.href); };
-                }
-
+                if (game.celeste) card.onclick = (e) => { e.preventDefault(); checkCeleste(game.href); };
                 card.innerHTML = '<div class="card-img-wrap"><img src="' + game.img + '" alt="' + game.title + '" loading="lazy" onerror="this.style.background=\'rgba(0,212,255,0.05)\'; this.style.display=\'flex\'" /><div class="card-overlay"><div class="card-overlay-text">' + game.desc + '</div></div><div class="play-icon"><span class="material-icons-round">play_arrow</span></div></div><div class="card-body"><div class="card-title">' + game.emoji + ' ' + game.title + '</div><div class="card-cat">' + (catLabels[game.cat] || game.cat) + '</div></div>';
                 card.addEventListener('mouseenter', () => { playHoverSound(); spawnEmoji(game.emoji); });
-                card.addEventListener('click', () => { if(!game.loadWarning) playClickSound(); });
+                card.addEventListener('click', () => playClickSound());
                 grid.appendChild(card);
                 setTimeout(() => card.classList.add('visible'), 80 * i + 50);
             });
@@ -1857,8 +1860,7 @@
             renderGames(cat, document.getElementById('search-input').value);
         }
         function searchGames(val) { renderGames(currentFilter, val); }
-        
-        // ========== LOAD WARNING MODAL ==========
+        // ========== CELESTE MODAL ==========
         let pendingUrl = "";
         function checkCeleste(url) {
             pendingUrl = url;
@@ -1866,7 +1868,6 @@
             playErrorSound();
         }
         function proceedToGame() { playClickSound(); window.location.href = pendingUrl; }
-
         // ========== CLOCK ==========
         function updateClock() {
             const now = new Date();
@@ -2145,34 +2146,6 @@
             }, 3500);
             animateLoadingText();
         });
-        // --- IRON SNOUT LOADER ---
-function launchGame(url) {
-    const gameView = document.getElementById('game-view');
-    const gameFrame = document.getElementById('game-frame');
-    
-    if (gameView && gameFrame) {
-        gameFrame.src = url; 
-        gameView.style.display = 'block';
-        // Optional: Hide the main scrollbar so the page doesn't move behind the game
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function closeGame() {
-    const gameView = document.getElementById('game-view');
-    const gameFrame = document.getElementById('game-frame');
-    
-    if (gameView && gameFrame) {
-        gameView.style.display = 'none';
-        gameFrame.src = ''; 
-        document.body.style.overflow = 'auto';
-    }
-}
-
-// ========== INIT ==========
-        window.addEventListener('load', () => {
-            initWelcomeCanvas();
-            // ... (the rest of your existing init code)
     </script>
 </body>
 </html>
