@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Lock the viewport: no pinch/double-tap zoom, respects notches -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Iron Snout</title>
+
+  <!-- Preload the first-frame texture atlases so the loader is shorter -->
+  <link rel="preload" as="image" href="html5game/IronSnout_texture_0.png">
+  <link rel="preload" as="image" href="html5game/IronSnout_texture_1.png">
+
+  <style>
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background: #000; overflow: hidden;
+      overscroll-behavior: none;
+    }
+    #stage {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    canvas#canvas {
+      display: block;
+      width: 100%; height: 100%;
+      touch-action: none;
+      image-rendering: pixelated;
+    }
+    #loader {
+      position: fixed; inset: 0; display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+      background: #000; color: #fff; z-index: 10;
+      font-family: system-ui, sans-serif;
+    }
+    #loader .spinner {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 6px solid #222; border-top-color: #ff3b3b;
+      animation: spin 1s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #play-overlay {
+      position: fixed; inset: 0; z-index: 20;
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column;
+      background: rgba(0,0,0,0.85); color: #fff;
+      font: 700 clamp(24px, 5vw, 56px)/1 system-ui, sans-serif;
+      letter-spacing: 2px; cursor: pointer; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #play-overlay.show { display: flex; }
+    #play-overlay .hint { font-size: 0.35em; margin-top: 1em; opacity: 0.7; font-weight: 400; }
+  </style>
+</head>
+<body>
+
+<div id="stage"><canvas id="canvas"></canvas></div>
+
+<div id="loader">
+  <div class="spinner"></div>
+  <div>Loading Iron Snout&hellip;</div>
+</div>
+
+<div id="play-overlay">
+  &#9654; CLICK TO PLAY
+  <div class="hint">(required to enable audio)</div>
+</div>
+
+<!-- Poki SDK stub: prevents crashes when the game calls PokiSDK.* -->
+<script>
+  window.PokiSDK = {
+    init:                function () { return Promise.resolve(); },
+    setDebug:            function () {},
+    gameLoadingStart:    function () {},
+    gameLoadingProgress: function () {},
+    gameLoadingFinished: function () {},
+    gameplayStart:       function () {},
+    gameplayStop:        function () {},
+    commercialBreak:     function () { return Promise.resolve(); },
+    rewardedBreak:       function () { return Promise.resolve(false); }
+  };
+</script>
+
+<!-- Game scripts (paths are relative to the repo root) -->
+<script src="html5game/hqh_gmCallback.js"></script>
+<script src="html5game/jqh_ImageLoadBar.js"></script>
+<script src="html5game/kqh_SnoutWeb.js"></script>
+<script src="html5game/iqh_poki.js"></script>
+<script src="html5game/oqh_GameAnalytics.js"></script>
+<script src="html5game/pqh_GameAnalyticsExt.js"></script>
+<script src="html5game/IronSnout.js"></script>
+
+<script>
+  var canvas  = document.getElementById("canvas");
+  var loader  = document.getElementById("loader");
+  var overlay = document.getElementById("play-overlay");
+
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width  = Math.floor(window.innerWidth  * dpr);
+    canvas.height = Math.floor(window.innerHeight * dpr);
+  }
+
+  window.addEventListener("resize", resize, { passive: true });
+  window.addEventListener("orientationchange", resize);
+
+  window.addEventListener("load", function () {
+    resize();
+    if (typeof GameMaker_Init === "function") GameMaker_Init();
+
+    loader.style.display = "none";
+    overlay.classList.add("show");
+  });
+
+  overlay.addEventListener("click", function () {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) new AC().resume();
+    } catch (_) {}
+    overlay.classList.remove("show");
+  }, { once: true });
+</script>
+
+</body>
+</html>
