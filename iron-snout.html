@@ -1,127 +1,62 @@
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L7856P3VNT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L7856P3VNT');
+</script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <!-- Lock the viewport: no pinch/double-tap zoom, respects notches -->
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <title>Iron Snout</title>
+    <base href="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@5374d57e9cee53129e2a4b730a63b8a6322e81de/iron%20snout/">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+    <title>Iron Snout</title>
+    <link rel="stylesheet" href="style.css">
+    <link id="-gd-engine-icon" rel="icon" type="image/png" href="favicon.png" />
 
-  <!-- Preload the first-frame texture atlases so the loader is shorter -->
-  <link rel="preload" as="image" href="html5game/IronSnout_texture_0.png">
-  <link rel="preload" as="image" href="html5game/IronSnout_texture_1.png">
-
-  <style>
-    html, body {
-      margin: 0; padding: 0; width: 100%; height: 100%;
-      background: #000; overflow: hidden;
-      overscroll-behavior: none;
-    }
-    #stage {
-      position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-    }
-    canvas#canvas {
-      display: block;
-      width: 100%; height: 100%;
-      touch-action: none;
-      image-rendering: pixelated;
-    }
-    #loader {
-      position: fixed; inset: 0; display: flex;
-      flex-direction: column; align-items: center; justify-content: center;
-      background: #000; color: #fff; z-index: 10;
-      font-family: system-ui, sans-serif;
-    }
-    #loader .spinner {
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 6px solid #222; border-top-color: #ff3b3b;
-      animation: spin 1s linear infinite; margin-bottom: 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #play-overlay {
-      position: fixed; inset: 0; z-index: 20;
-      display: none; align-items: center; justify-content: center;
-      flex-direction: column;
-      background: rgba(0,0,0,0.85); color: #fff;
-      font: 700 clamp(24px, 5vw, 56px)/1 system-ui, sans-serif;
-      letter-spacing: 2px; cursor: pointer; user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #play-overlay.show { display: flex; }
-    #play-overlay .hint { font-size: 0.35em; margin-top: 1em; opacity: 0.7; font-weight: 400; }
-  </style>
+<style>
+#sidebarad1, #sidebarad2 {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  width: 160px; height: 600px; padding: 0; margin: 0; z-index: 999999;
+}
+#sidebarad1 { left: 0; }
+#sidebarad2 { right: 0; }
+.sidebar-close {
+  position: absolute; top: 0; right: 0; width: 22px; height: 22px;
+  line-height: 22px; text-align: center; background: rgba(0,0,0,0.7);
+  color: #fff; font-size: 14px; cursor: pointer; user-select: none; z-index: 10;
+}
+.sidebar-frame { width: 160px; height: 600px; border: none; display: block; }
+</style>
 </head>
+
 <body>
+    <script src="main.js"></script>
+    <div id="loading-text" style="color: white; font-family: cursive; font-size: 48px; text-align: center; margin-top: 20px;">LOADING IRON SNOUT...</div>
+    <canvas id="canvas"> Your browser does not support the canvas tag. </canvas>
+    <noscript> Your browser does not support JavaScript. </noscript>
 
-<div id="stage"><canvas id="canvas"></canvas></div>
+    <!-- Game loading script -->
+    <script src="html5game/IronSnout.js"></script>
 
-<div id="loader">
-  <div class="spinner"></div>
-  <div>Loading Iron Snout&hellip;</div>
-</div>
+    <div id="status">
+        <img id="status-splash" src="splash.png" alt="" style="max-width:100%;">
+        <progress id="status-progress"></progress>
+        <div id="status-notice"></div>
+    </div>
 
-<div id="play-overlay">
-  &#9654; CLICK TO PLAY
-  <div class="hint">(required to enable audio)</div>
-</div>
+    <div id="sidebarad1">
+      <div class="sidebar-close" onclick="this.parentElement.style.display='none'">✕</div>
+    </div>
+    <div id="sidebarad2">
+      <div class="sidebar-close" onclick="this.parentElement.style.display='none'">✕</div>
+    </div>
 
-<!-- Poki SDK stub: prevents crashes when the game calls PokiSDK.* -->
-<script>
-  window.PokiSDK = {
-    init:                function () { return Promise.resolve(); },
-    setDebug:            function () {},
-    gameLoadingStart:    function () {},
-    gameLoadingProgress: function () {},
-    gameLoadingFinished: function () {},
-    gameplayStart:       function () {},
-    gameplayStop:        function () {},
-    commercialBreak:     function () { return Promise.resolve(); },
-    rewardedBreak:       function () { return Promise.resolve(false); }
-  };
-</script>
-
-<!-- Game scripts (paths are relative to the repo root) -->
-<script src="html5game/hqh_gmCallback.js"></script>
-<script src="html5game/jqh_ImageLoadBar.js"></script>
-<script src="html5game/kqh_SnoutWeb.js"></script>
-<script src="html5game/iqh_poki.js"></script>
-<script src="html5game/oqh_GameAnalytics.js"></script>
-<script src="html5game/pqh_GameAnalyticsExt.js"></script>
-<script src="html5game/IronSnout.js"></script>
-
-<script>
-  var canvas  = document.getElementById("canvas");
-  var loader  = document.getElementById("loader");
-  var overlay = document.getElementById("play-overlay");
-
-  function resize() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width  = Math.floor(window.innerWidth  * dpr);
-    canvas.height = Math.floor(window.innerHeight * dpr);
-  }
-
-  window.addEventListener("resize", resize, { passive: true });
-  window.addEventListener("orientationchange", resize);
-
-  window.addEventListener("load", function () {
-    resize();
-    if (typeof GameMaker_Init === "function") GameMaker_Init();
-
-    loader.style.display = "none";
-    overlay.classList.add("show");
-  });
-
-  overlay.addEventListener("click", function () {
-    try {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) new AC().resume();
-    } catch (_) {}
-    overlay.classList.remove("show");
-  }, { once: true });
-</script>
-
+    <script>
+        // You can add custom loading logic here if needed
+        console.log("Iron Snout loading from CDN...");
+    </script>
 </body>
 </html>
