@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Soundboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0f1e;
+            color: #0ff;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 { color: #0ff; text-shadow: 0 0 15px #0ff; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+        button {
+            padding: 25px 15px;
+            font-size: 1.1em;
+            background: #16213e;
+            color: #00ffff;
+            border: 3px solid #00ffff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #00ffff;
+            color: #0f0f1e;
+            transform: scale(1.08);
+        }
+        .stop-all {
+            margin: 20px;
+            padding: 15px 50px;
+            font-size: 1.3em;
+            background: #ff0066;
+            color: white;
+            border: none;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚡ INSTANT SOUNDBOARD (Remote Sounds)</h1>
+    
+    <button class="stop-all" onclick="stopAll()">⏹ STOP ALL</button>
+    
+    <div class="grid" id="soundboard"></div>
+
+    <script>
+        // Remote sound examples - add more as you like
+        const sounds = [
+            { name: "Air Horn", url: "https://www.myinstants.com/media/sounds/airhorn.mp3" },
+            { name: "Bruh", url: "https://www.myinstants.com/media/sounds/bruh.mp3" },
+            { name: "Sad Trombone", url: "https://www.myinstants.com/media/sounds/sad-trombone.mp3" },
+            { name: "Victory", url: "https://www.myinstants.com/media/sounds/victory.mp3" },
+            { name: "Laugh", url: "https://www.myinstants.com/media/sounds/laugh.mp3" },
+            { name: "Yee", url: "https://www.myinstants.com/media/sounds/yee.mp3" },
+            { name: "Windows XP Error", url: "https://www.myinstants.com/media/sounds/windows-xp-error.mp3" },
+            // Add more public MP3 links here
+        ];
+
+        const audioPool = {};
+
+        function createBoard() {
+            const container = document.getElementById('soundboard');
+            container.innerHTML = '';
+
+            sounds.forEach(sound => {
+                const btn = document.createElement('button');
+                btn.textContent = sound.name;
+
+                btn.onclick = () => {
+                    if (!audioPool[sound.url]) {
+                        audioPool[sound.url] = new Audio(sound.url);
+                    }
+                    const audio = audioPool[sound.url];
+                    audio.currentTime = 0;
+                    audio.play();
+                };
+
+                container.appendChild(btn);
+            });
+        }
+
+        function stopAll() {
+            Object.values(audioPool).forEach(a => {
+                a.pause();
+                a.currentTime = 0;
+            });
+        }
+
+        window.onload = createBoard;
+    </script>
+</body>
+</html>
