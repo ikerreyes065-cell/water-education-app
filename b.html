@@ -1,103 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Soundboard</title>
+<html lang="en-us">
+  <head>
+    <base href="https://cdn.jsdelivr.net/gh/web-ports/baldi-mods@a9a006b703c35330ec3925de5a1edcc99df123c8/-b/">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | -b</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #0f0f1e;
-            color: #0ff;
-            text-align: center;
-            padding: 20px;
-            margin: 0;
-        }
-        h1 { color: #0ff; text-shadow: 0 0 15px #0ff; }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            max-width: 1100px;
-            margin: 30px auto;
-        }
-        button {
-            padding: 25px 15px;
-            font-size: 1.1em;
-            background: #16213e;
-            color: #00ffff;
-            border: 3px solid #00ffff;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        button:hover {
-            background: #00ffff;
-            color: #0f0f1e;
-            transform: scale(1.08);
-        }
-        .stop-all {
-            margin: 20px;
-            padding: 15px 50px;
-            font-size: 1.3em;
-            background: #ff0066;
-            color: white;
-            border: none;
-            border-radius: 50px;
-        }
+      body {
+        background-color: black;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      #gameContainer {
+        width: 100vw !important;
+        height: 100vh !important;
+      }
+      canvas {
+        width: 100% !important;
+        height: 100% !important;
+      }
+#loading-text {
+  font-weight: bold;
+  background: linear-gradient(
+    270deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #4b0082,
+    #8f00ff
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow 3s ease infinite;
+}
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
     </style>
-</head>
-<body>
-    <h1>⚡ INSTANT SOUNDBOARD (Remote Sounds)</h1>
-    
-    <button class="stop-all" onclick="stopAll()">⏹ STOP ALL</button>
-    
-    <div class="grid" id="soundboard"></div>
-
+  </head>
+  <body>
+<div id="loading-text"
+    style="color: white; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"> LOADING...
+  </div>
+    <div id="gameContainer"></div>
+    <script src="Build/UnityLoader.js"></script>
     <script>
-        // Remote sound examples - add more as you like
-        const sounds = [
-            { name: "Air Horn", url: "https://www.myinstants.com/media/sounds/airhorn.mp3" },
-            { name: "Bruh", url: "https://www.myinstants.com/media/sounds/bruh.mp3" },
-            { name: "Sad Trombone", url: "https://www.myinstants.com/media/sounds/sad-trombone.mp3" },
-            { name: "Victory", url: "https://www.myinstants.com/media/sounds/victory.mp3" },
-            { name: "Laugh", url: "https://www.myinstants.com/media/sounds/laugh.mp3" },
-            { name: "Yee", url: "https://www.myinstants.com/media/sounds/yee.mp3" },
-            { name: "Windows XP Error", url: "https://www.myinstants.com/media/sounds/windows-xp-error.mp3" },
-            // Add more public MP3 links here
-        ];
+var loadingText = document.querySelector("#loading-text");
+    let totalBytes = 0;
+    let loadedBytes = 0;
 
-        const audioPool = {};
+    async function fetchWithProgress(url) {
+      const response = await fetch(url);
+      const reader = response.body.getReader();
+      let chunks = [];
+      let received = 0;
+      while (true) {
+        const {
+          done,
+          value
+        } = await reader.read();
+        if (done) break;
+        received += value.length;
+        loadedBytes += value.length;
+        chunks.push(value);
+        let mbDone = (loadedBytes / (1024 * 1024)).toFixed(2);
+        let mbTotal = '49.47';
+        loadingText.textContent = `LOADING... ${mbDone} MB / ${mbTotal} MB`;
+      }
+      let fullBuffer = new Uint8Array(received);
+      let offset = 0;
+      for (let chunk of chunks) {
+        fullBuffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+      return fullBuffer.buffer;
+    }
 
-        function createBoard() {
-            const container = document.getElementById('soundboard');
-            container.innerHTML = '';
+    async function mergeFiles(fileParts, cacheKey) {
+      const cache = await caches.open("-b-cache");
+      const cachedResponse = await cache.match(cacheKey);
+      if (cachedResponse) {
+        const blob = await cachedResponse.blob();
+        return URL.createObjectURL(blob);
+      }
+      const buffers = await Promise.all(
+        fileParts.map(part => fetchWithProgress(part))
+      );
+      const mergedBlob = new Blob(buffers);
+      const response = new Response(mergedBlob);
+      await cache.put(cacheKey, response);
+      return URL.createObjectURL(mergedBlob);
+    }
 
-            sounds.forEach(sound => {
-                const btn = document.createElement('button');
-                btn.textContent = sound.name;
+    function getParts(file, start, end) {
+      let parts = [];
+      for (let i = start; i <= end; i++) {
+        parts.push(file + ".part" + i);
+      }
+      return parts;
+    }
+    (async () => {
+      const [dataUrl, wasmUrl] = await Promise.all([
+        mergeFiles(getParts("Build/minusbbog.data.unityweb", 1, 2), "minusbbog.data.unityweb"),
+        mergeFiles(getParts("Build/minusbbog.wasm.code.unityweb", 1, 2), "minusbbog.wasm.code.unityweb"),
+      ]);
 
-                btn.onclick = () => {
-                    if (!audioPool[sound.url]) {
-                        audioPool[sound.url] = new Audio(sound.url);
-                    }
-                    const audio = audioPool[sound.url];
-                    audio.currentTime = 0;
-                    audio.play();
-                };
-
-                container.appendChild(btn);
-            });
-        }
-
-        function stopAll() {
-            Object.values(audioPool).forEach(a => {
-                a.pause();
-                a.currentTime = 0;
-            });
-        }
-
-        window.onload = createBoard;
+      const originalOpen = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (method, url, ...rest) {
+          if (url.includes("minusbbog.data.unityweb")) {
+              url = dataUrl;
+          } else if (url.includes("minusbbog.wasm.code.unityweb")) {
+              url = wasmUrl;
+          }
+          return originalOpen.call(this, method, url, ...rest);
+      };
+      var unityInstance = UnityLoader.instantiate("gameContainer", "Build/minusbbog.json");
+      loadingText.remove();
+    })();
     </script>
-</body>
+  </body>
 </html>
